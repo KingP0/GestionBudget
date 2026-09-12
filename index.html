@@ -15,6 +15,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <style>
 :root{
+  color-scheme:dark;
+  /* Palette par défaut (vert sombre). Remplacée au démarrage par applyTheme(). */
   --bg:#0F2420;
   --surface:#16302A;
   --surface-2:#1C3B34;
@@ -25,6 +27,11 @@
   --good:#8ED6A9;
   --warn:#E9B45A;
   --bad:#E97D63;
+  --on-accent:#0C2019;
+  --on-warn:#231602;
+  --tabbg:#0F2420EB;
+  --scrim:rgba(6,16,14,.62);
+  --shadow:rgba(0,0,0,.45);
   --radius:14px;
   --gut:16px;
 }
@@ -122,24 +129,31 @@ section{margin-bottom:22px}
 .item.child .mid::before{content:"└ ";color:var(--ink-3)}
 
 .btn{display:block;width:100%;text-align:center;padding:13px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);font-weight:500}
-.btn.primary{background:var(--good);color:#0C2019;border-color:transparent;font-weight:600}
+.btn.primary{background:var(--good);color:var(--on-accent);border-color:transparent;font-weight:600}
 .btn.ghost{background:none}
 .btn.danger{color:var(--bad)}
 .btn+.btn{margin-top:9px}
 .chips{display:flex;flex-wrap:wrap;gap:7px}
 .chip{padding:8px 12px;border-radius:20px;border:1px solid var(--line);background:var(--surface-2);font-size:13.5px}
-.chip[aria-pressed="true"]{background:var(--good);color:#0C2019;border-color:transparent;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--good);color:var(--on-accent);border-color:transparent;font-weight:600}
+.chip.sm{padding:6px 10px;font-size:12.5px}
+
+/* ---- choix du thème ---- */
+.swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.sw{border:1px solid var(--line);border-radius:13px;padding:11px 3px 8px;display:flex;flex-direction:column;align-items:center;gap:7px;font-size:10.5px;line-height:1.2}
+.sw .dot{width:22px;height:22px;border-radius:50%}
+.sw[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 
 /* ---- barre d'onglets + FAB ---- */
-.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;background:rgba(15,36,32,.92);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;background:var(--tabbg);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
 .tabs button{flex:1;padding:9px 0 10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--ink-3)}
 .tabs button svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .tabs button[aria-selected="true"]{color:var(--good)}
-.fab{position:fixed;z-index:31;right:max(18px,calc(50% - 270px + 18px));bottom:calc(84px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:19px;background:var(--good);color:#0C2019;display:grid;place-items:center;font-size:28px;box-shadow:0 8px 22px rgba(0,0,0,.45)}
+.fab{position:fixed;z-index:31;right:max(18px,calc(50% - 270px + 18px));bottom:calc(84px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:19px;background:var(--good);color:var(--on-accent);display:grid;place-items:center;font-size:28px;box-shadow:0 8px 22px var(--shadow)}
 .fab:active{transform:scale(.94)}
 
 /* ---- feuille modale ---- */
-.sheetwrap{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;background:rgba(6,16,14,.6)}
+.sheetwrap{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;background:var(--scrim)}
 .sheet{width:100%;max-width:540px;max-height:92vh;overflow-y:auto;background:var(--bg);border:1px solid var(--line);border-bottom:none;border-radius:20px 20px 0 0;padding:8px var(--gut) calc(22px + env(safe-area-inset-bottom));animation:up .22s cubic-bezier(.2,.8,.3,1)}
 @keyframes up{from{transform:translateY(18px);opacity:.4}}
 @media (prefers-reduced-motion:reduce){.sheet{animation:none}.pace .fill{transition:none}}
@@ -150,10 +164,66 @@ section{margin-bottom:22px}
 .bigamount{font-size:38px!important;text-align:center;padding:14px!important;font-family:"Instrument Serif",Georgia,serif}
 .rowbtns{display:flex;gap:9px;margin-top:6px}
 .rowbtns .btn{margin-top:0}
-.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;background:var(--ink);color:#0C2019;padding:10px 16px;border-radius:20px;font-size:13.5px;font-weight:500;box-shadow:0 6px 18px rgba(0,0,0,.4)}
-.warnbar{background:var(--warn);color:#231602;padding:9px 14px;font-size:13px;text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:20px;font-size:13.5px;font-weight:500;box-shadow:0 6px 18px var(--shadow);max-width:calc(100% - 32px);text-align:center}
+.warnbar{background:var(--warn);color:var(--on-warn);padding:9px 14px;font-size:13px;text-align:center}
 .empty{text-align:center;color:var(--ink-2);padding:26px 10px;font-size:14px}
 </style>
+<script>
+/* ============ thèmes ============
+   Un thème = une teinte + un mode (sombre/clair). Toute la palette en découle,
+   ce qui évite d'écrire 16 jeux de couleurs à la main. Ce script est dans le
+   <head> pour peindre la bonne couleur dès la première image. */
+const THEMES=[
+  {id:'vert',    name:'Vert',     h:167},
+  {id:'ocean',   name:'Océan',    h:191},
+  {id:'bleu',    name:'Bleu',     h:216},
+  {id:'violet',  name:'Violet',   h:266},
+  {id:'rose',    name:'Rose',     h:329},
+  {id:'rouge',   name:'Rouge',    h:6,   bad:'#FF8FA8'},
+  {id:'ambre',   name:'Ambre',    h:36,  warn:'#D8CF5F'},
+  {id:'graphite',name:'Graphite', h:222, sat:.10}
+];
+function hsl2hex(h,s,l){
+  s/=100;l/=100;
+  const k=n=>(n+h/30)%12, a=s*Math.min(l,1-l);
+  const f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));
+  const b=n=>Math.round(255*f(n)).toString(16).padStart(2,'0');
+  return '#'+b(0)+b(8)+b(4);
+}
+function palette(id,mode){
+  const t=THEMES.find(x=>x.id===id)||THEMES[0];
+  const k=t.sat==null?1:t.sat;
+  const C=(s,l)=>hsl2hex(t.h,Math.round(s*k),l);
+  if(mode==='clair'){
+    const bg=C(30,97);
+    return {bg,surface:'#FFFFFF','surface-2':C(26,95),line:C(20,86),
+      ink:C(34,13),'ink-2':C(14,30),'ink-3':C(12,41),
+      good:C(58,31),warn:t.warn?'#7A5E00':'#8A5A00',bad:'#B33A2B',
+      'on-accent':'#FFFFFF','on-warn':'#FFFFFF',
+      tabbg:'#FFFFFFEB',scrim:'rgba(24,32,30,.38)',shadow:'rgba(20,30,28,.16)',scheme:'light'};
+  }
+  const bg=C(40,10);
+  return {bg,surface:C(36,14),'surface-2':C(35,17),line:C(30,25),
+    ink:C(22,93),'ink-2':C(16,68),'ink-3':C(14,59),
+    good:C(48,70),warn:t.warn||'#E9B45A',bad:t.bad||'#EE8872',
+    'on-accent':C(45,10),'on-warn':'#231602',
+    tabbg:bg+'EB',scrim:'rgba(6,14,12,.62)',shadow:'rgba(0,0,0,.45)',scheme:'dark'};
+}
+function applyTheme(id,mode){
+  const p=palette(id,mode),r=document.documentElement;
+  for(const k in p) if(k!=='scheme') r.style.setProperty('--'+k,p[k]);
+  r.style.colorScheme=p.scheme;
+  const mt=document.querySelector('meta[name=theme-color]');
+  if(mt)mt.setAttribute('content',p.bg);
+  const sb=document.querySelector('meta[name=apple-mobile-web-app-status-bar-style]');
+  if(sb)sb.setAttribute('content',p.scheme==='light'?'default':'black-translucent');
+}
+/* Applique le thème enregistré avant le premier rendu. */
+try{
+  const s=JSON.parse(localStorage.getItem('budget.v1')||'{}').settings||{};
+  applyTheme(s.theme||'vert',s.mode||'sombre');
+}catch(e){}
+</script>
 </head>
 <body>
 <div id="storewarn" class="warnbar hidden">Le navigateur bloque l'enregistrement local. Les données seront perdues à la fermeture — ouvre le fichier depuis un serveur ou exporte régulièrement.</div>
@@ -172,7 +242,14 @@ const esc=(s)=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'
 
 const KEY='budget.v1';
 let persistent=true;
-function save(){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){persistent=false;$('#storewarn').classList.remove('hidden')}}
+function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){persistent=false;$('#storewarn').classList.remove('hidden')}}
+/* save() horodate, écrit en local, puis programme l'écriture dans le fichier
+   de sauvegarde. `{backup:false}` évite de reboucler depuis writeBackup(). */
+function save(opt){
+  D.updatedAt=new Date().toISOString();
+  saveLocal();
+  if(!opt||opt.backup!==false)queueBackup();
+}
 function loadRaw(){try{return localStorage.getItem(KEY)}catch(e){persistent=false;$('#storewarn').classList.remove('hidden');return null}}
 
 /* ============ dates ============ */
@@ -192,8 +269,10 @@ function dayLabel(iso){const d=new Date(iso+'T12:00');const t=new Date();const y
 /* ============ données ============ */
 function defaults(){
   const C=(id,name,emoji,budget,extra={})=>({id,name,emoji,budget,parent:null,...extra});
-  return {v:1,
-    settings:{alert:.8,carry:true},
+  return {v:2,
+    settings:{alert:.8,carry:true,theme:'vert',mode:'sombre',
+      salary:{label:'Salaire net',net:0,months:12,mode:'reel',bonusLabel:'13ᵉ mois',parts:[]},
+      backup:{auto:true,daily:false,name:'budget.json',lastAt:null,remindDays:7}},
     categories:[
       C('alim','Alimentaire','🛒',null),
       C('resto','Restaurants & bars','🍜',null),
@@ -213,6 +292,57 @@ function defaults(){
 let D=(()=>{const r=loadRaw();if(!r)return defaults();try{const p=JSON.parse(r);return p&&p.categories?p:defaults()}catch(e){return defaults()}})();
 let cur=thisKey(), view='mois';
 
+/* ============ migration ============
+   Un fichier peut être tronqué, ancien ou venir d'une autre version : on remet
+   d'aplomb la structure avant tout le reste, sinon le rendu casse plus loin. */
+function repair(){
+  if(!D||typeof D!=='object')D=defaults();
+  if(!D.settings||typeof D.settings!=='object')D.settings={};
+  if(!Array.isArray(D.categories)||!D.categories.length)D.categories=defaults().categories;
+  if(!Array.isArray(D.recurring))D.recurring=[];
+  if(!D.months||typeof D.months!=='object')D.months={};
+  Object.keys(D.months).forEach(k=>{
+    const m=D.months[k];
+    if(!m||typeof m!=='object'){delete D.months[k];return}
+    if(!Array.isArray(m.incomes))m.incomes=[];
+    if(!Array.isArray(m.expenses))m.expenses=[];
+    if(!m.budgets||typeof m.budgets!=='object')m.budgets={};
+    m.closed=!!m.closed;
+  });
+}
+/* v1 → v2 : le salaire devient un profil annuel (12/13/14 mois) au lieu d'une
+   ligne de revenu recopiée de mois en mois. On récupère le montant déjà saisi et
+   on marque les lignes existantes pour que rien ne soit compté deux fois. */
+function migrate(){
+  repair();
+  const s=D.settings;
+  if(!(D.v>=2)){
+    const keys=Object.keys(D.months||{}).sort();
+    const isSal=i=>/salaire|paie|paye/i.test(i.label||'');
+    let net=0;
+    for(const k of keys.slice().reverse()){
+      const inc=D.months[k].incomes||[];
+      const sal=inc.find(isSal)||(inc.length===1?inc[0]:null);
+      if(sal&&sal.amount>0){net=sal.amount;break}
+    }
+    keys.forEach(k=>{
+      const inc=D.months[k].incomes||[];
+      const sal=inc.find(isSal)||(inc.length===1?inc[0]:null);
+      if(sal)sal.sid='base';
+      inc.forEach(i=>{if(!i.sid&&i.keep===undefined)i.keep=true});
+    });
+    s.salary={label:'Salaire net',net,months:12,mode:'reel',bonusLabel:'13ᵉ mois',parts:[]};
+    D.v=2;
+  }
+  s.theme=s.theme||'vert';
+  s.mode=s.mode||'sombre';
+  if(!s.salary)s.salary={label:'Salaire net',net:0,months:12,mode:'reel',bonusLabel:'13ᵉ mois',parts:[]};
+  if(!s.backup)s.backup={auto:true,daily:false,name:'budget.json',lastAt:null,remindDays:7};
+  if(s.alert==null)s.alert=.8;
+  if(s.carry==null)s.carry=true;
+}
+migrate();
+
 const catOf=id=>D.categories.find(c=>c.id===id);
 const kids=id=>D.categories.filter(c=>c.parent===id);
 const roots=()=>D.categories.filter(c=>!c.parent);
@@ -224,11 +354,60 @@ const emojiOf=id=>{const c=catOf(id);return (c&&c.emoji)||(rootOf(id)||{}).emoji
 function monthlyAmount(r){return r.freq==='yearly'?r.amount/12:r.freq==='quarterly'?r.amount/3:r.amount}
 function freqLabel(r){return r.freq==='yearly'?'annuel, lissé':r.freq==='quarterly'?'trimestriel, lissé':'mensuel'}
 
+/* ============ salaire ============
+   Le salaire est un profil annuel : un net mensuel, plus d'éventuels mois
+   supplémentaires (13ᵉ, 14ᵉ) versés sur un ou plusieurs mois de l'année.
+   Chaque mois en tire ses lignes de revenu, marquées d'un `sid` : elles sont
+   régénérées quand le profil change, alors que les revenus saisis à la main
+   (primes, remboursements) ne sont jamais touchés. */
+const MONTHNAMES=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+const MONTHSHORT=['jan','fév','mar','avr','mai','juin','juil','août','sep','oct','nov','déc'];
+const frList=a=>a.length>1?a.slice(0,-1).join(', ')+' et '+a[a.length-1]:(a[0]||'');
+const r2=x=>+(+x||0).toFixed(2);
+const SAL=()=>D.settings.salary;
+function bonusTotal(s){return (s.parts||[]).reduce((a,p)=>a+(+p.amount||0),0)}
+function salaryYear(s){return r2(s.net*12+bonusTotal(s))}
+function salaryLines(k){
+  const s=SAL(),mo=+k.slice(5,7),out=[];
+  if(s.mode==='lisse'){
+    out.push({sid:'base',label:s.label||'Salaire net',amount:r2(s.net+bonusTotal(s)/12),smoothed:bonusTotal(s)>0});
+  }else{
+    out.push({sid:'base',label:s.label||'Salaire net',amount:r2(s.net)});
+    (s.parts||[]).filter(p=>+p.month===mo&&+p.amount).forEach(p=>{
+      out.push({sid:'p'+p.month,label:s.bonusLabel||'13ᵉ mois',amount:r2(p.amount)});
+    });
+  }
+  return out;
+}
+function syncSalary(m,k){
+  const want=salaryLines(k),manual=m.incomes.filter(i=>!i.sid);
+  m.incomes=want.map(w=>{
+    const old=m.incomes.find(i=>i.sid===w.sid);
+    return {id:old?old.id:uid(),...w};
+  }).concat(manual);
+}
+/* Un changement de profil s'applique au mois affiché et aux suivants ;
+   les mois passés et les mois clôturés gardent ce qui a réellement été perçu. */
+function syncSalaryForward(){
+  Object.keys(D.months).forEach(k=>{if(k>=cur&&!D.months[k].closed)syncSalary(D.months[k],k)});
+}
+function salarySummary(){
+  const s=SAL(),bt=bonusTotal(s);
+  if(!s.net&&!bt)return 'à configurer';
+  if(!bt)return '12 mois';
+  const nb=s.net?Math.round((12+bt/s.net)*10)/10:0;
+  const lab=nb?String(nb).replace('.',',')+' mois':eur(bt)+' en plus';
+  if(s.mode==='lisse')return lab+', lissé sur l\'année';
+  const n=(s.parts||[]).filter(p=>+p.amount).map(p=>MONTHNAMES[+p.month-1]);
+  return lab+' · '+(frList(n)||'—');
+}
+
 function ensureMonth(k){
   if(D.months[k])return D.months[k];
   const prev=D.months[shiftKey(k,-1)];
-  const m={incomes:prev?prev.incomes.map(i=>({...i,id:uid()})):[{id:uid(),label:'Salaire net',amount:0}],
+  const m={incomes:prev?prev.incomes.filter(i=>!i.sid&&i.keep!==false).map(i=>({...i,id:uid()})):[],
            budgets:{},expenses:[],closed:false};
+  syncSalary(m,k);
   D.categories.forEach(c=>{if(c.budget!=null)m.budgets[c.id]=c.budget});
   D.recurring.filter(r=>r.active!==false).forEach(r=>{
     m.expenses.push({id:uid(),label:r.label,amount:+monthlyAmount(r).toFixed(2),catId:r.catId,date:k+'-01',rid:r.id});
@@ -328,7 +507,12 @@ function viewMois(m){
 
   const last=[...m.expenses].sort((a,b)=>(b.date+b.id).localeCompare(a.date+a.id)).slice(0,5).map(expRow).join('');
 
+  const bkWarn=backupLate()?`<div class="alert" style="border-left-color:var(--ink-2)"><span class="ico">💾</span><div>${
+      D.settings.backup.lastAt?`Aucune sauvegarde depuis ${backupAge()} jours.`:`Tes données ne sont enregistrées que sur cet appareil.`}
+      <button ${dirH&&!needAuth?'data-act="bsave"':'data-tab="reglages"'} style="color:var(--good)">${dirH&&!needAuth?'Sauvegarder':'Configurer'}</button></div></div>`:'';
+
   return `${m.closed?`<div class="alert" style="border-left-color:var(--ink-2)"><span class="ico">🔒</span><div>Mois clôturé. <button data-unlock style="color:var(--good)">Rouvrir</button></div></div>`:''}
+  ${bkWarn}
   <div class="hero">
     <span class="label">Reste à vivre</span>
     <span class="amount serif num" style="color:${t.left<0?'var(--bad)':'var(--ink)'}">${eur(t.left)}</span>
@@ -431,7 +615,56 @@ function viewRecap(m){
 
 /* ---- vue Réglages ---- */
 function viewReglages(m){
-  const inc=m.incomes.map(i=>`<button class="item" data-income="${i.id}"><span class="mid">${esc(i.label)}</span><span class="num">${eur(i.amount)}</span></button>`).join('');
+  const S=D.settings;
+  const salL=m.incomes.filter(i=>i.sid),manL=m.incomes.filter(i=>!i.sid);
+  const incTot=m.incomes.reduce((a,i)=>a+i.amount,0);
+  const inc=(salL.length?salL:[{sid:'base',label:'Salaire',amount:0}]).map(i=>
+      `<button class="item" data-salary="1"><span>💼</span><span class="mid">${esc(i.label)}
+        <span class="s">${i.sid==='base'?esc(salarySummary())+(i.smoothed?' · complément lissé inclus':''):'mois supplémentaire'}</span></span>
+        <span class="num">${eur(i.amount)}</span></button>`).join('')
+    +manL.map(i=>`<button class="item" data-income="${i.id}"><span>＋</span><span class="mid">${esc(i.label)}
+        <span class="s">${i.keep===false?'ce mois uniquement':'chaque mois'}</span></span>
+        <span class="num">${eur(i.amount)}</span></button>`).join('')
+    +`<div class="item" style="border-top:1px solid var(--line)"><span class="mid muted">Total du mois</span><span class="num">${eur(incTot)}</span></div>`;
+
+  const sw=THEMES.map(t=>{
+    const p=palette(t.id,S.mode),on=S.theme===t.id;
+    return `<button class="sw" data-theme="${t.id}" aria-pressed="${on}"
+      style="background:${p.bg};color:${p['ink-2']};border-color:${on?p.good:p.line}${on?';box-shadow:inset 0 0 0 1px '+p.good:''}">
+      <span class="dot" style="background:${p.good}"></span>${t.name}</button>`}).join('');
+
+  const bk=S.backup,last=bk.lastAt?'Dernière sauvegarde '+whenTxt(bk.lastAt):'Jamais sauvegardé';
+  /* Proposé dès qu'aucun dossier n'est connecté : c'est la seule automatisation
+     possible sur Firefox et sur Safari iOS. */
+  const dailyBox=`<label class="card" style="display:flex;gap:10px;align-items:flex-start;padding:14px;margin-top:9px">
+      <input type="checkbox" id="bdaily" ${bk.daily?'checked':''} style="width:20px;height:20px;flex:none;margin-top:2px;accent-color:var(--good)">
+      <span>Télécharger une sauvegarde chaque jour<span class="s tiny muted" style="display:block">Une fois par jour, au premier appui dans l'app : le fichier part dans le dossier Téléchargements du téléphone. Le navigateur peut demander confirmation.</span></span></label>`;
+  let backupUI;
+  if(FS_OK&&dirH){
+    backupUI=`<div class="card" style="padding:14px;margin-bottom:9px">
+        <div style="display:flex;gap:10px;align-items:flex-start"><span>📁</span><div style="flex:1;min-width:0">
+          <div style="word-break:break-all">${esc(dirH.name)}/${esc(backupName())}</div>
+          <div class="tiny muted">${last}${needAuth?' · accès à réautoriser':''}</div></div></div>
+        <label style="display:flex;gap:10px;align-items:flex-start;border-top:1px solid var(--line);margin-top:12px;padding:12px 0 2px">
+          <input type="checkbox" id="bauto" ${bk.auto!==false?'checked':''} style="width:20px;height:20px;flex:none;margin-top:2px;accent-color:var(--good)">
+          <span>Sauvegarder automatiquement<span class="s tiny muted" style="display:block">Ce fichier unique est réécrit à chaque modification, sans rien demander et sans créer de copie datée.</span></span></label>
+      </div>
+      ${needAuth?`<button class="btn primary" data-act="reauth">Réautoriser l'accès au dossier</button>`:''}
+      <button class="btn" data-act="bsave">Sauvegarder maintenant</button>
+      <button class="btn" data-act="bload">Récupérer depuis le dossier</button>
+      <div class="rowbtns"><button class="btn ghost" data-act="bfolder">Changer de dossier</button>
+        <button class="btn ghost" data-act="bforget">Oublier</button></div>`;
+  }else if(FS_OK){
+    /* Pas de téléchargement quotidien proposé ici : ce navigateur sait écrire
+       dans un dossier, donc un seul fichier réécrit, sans copies datées. */
+    backupUI=`<button class="btn primary" data-act="bfolder">Choisir un dossier de sauvegarde</button>
+      <div class="tiny muted" style="margin:9px 2px 0">${last}. Choisis le dossier que tu veux, par exemple <i>Documents/Budget</i> : l'app y écrit <b>${esc(backupName())}</b> — un seul fichier, réécrit à chaque modification — et le relit à l'ouverture. Installe l'app sur l'écran d'accueil pour que l'autorisation soit conservée durablement.</div>`;
+  }else{
+    backupUI=`<button class="btn primary" data-act="bshare">${SHARE_OK?'Envoyer la sauvegarde…':'Télécharger la sauvegarde'}</button>
+      <div class="tiny muted" style="margin:9px 2px 0">${last}. Ce navigateur ne donne pas accès à un dossier — c'est le cas de Firefox et de Safari, et ça ne dépend pas de l'app. ${SHARE_OK?'Le partage permet d\'envoyer le fichier vers Fichiers, Drive ou iCloud, en écrasant la sauvegarde précédente. ':''}Sinon, le téléchargement quotidien ci-dessous est l'automatisation la plus proche.</div>
+      ${dailyBox}`;
+  }
+
   const cats=roots().map(c=>{
     const b=m.budgets[c.id];
     const kk=kids(c.id).map(k=>`<button class="item child" data-catedit="${k.id}"><span class="mid">${esc(k.name)}</span><span class="num muted">${m.budgets[k.id]!=null?eur(m.budgets[k.id]):'—'}</span></button>`).join('');
@@ -449,20 +682,39 @@ function viewReglages(m){
     <section><div class="sechead"><h2>Catégories et enveloppes</h2><button data-act="cat-add">Ajouter</button></div>
       <div class="card">${cats}</div>
       <div class="tiny muted" style="margin:8px 2px">Les enveloppes modifiées s'appliquent à ${labelOf(cur)} et aux mois suivants. Les mois passés gardent les leurs.</div></section>
+    <section><div class="sechead"><h2>Apparence</h2></div>
+      <div class="card" style="padding:14px">
+        <div class="chips" style="margin-bottom:14px">
+          <button class="chip" data-mode="sombre" aria-pressed="${S.mode!=='clair'}">Sombre</button>
+          <button class="chip" data-mode="clair" aria-pressed="${S.mode==='clair'}">Clair</button></div>
+        <div class="swatches">${sw}</div>
+      </div></section>
     <section><div class="sechead"><h2>Options</h2></div>
       <div class="card" style="padding:14px">
         <div class="field"><label for="alert">Prévenir quand une enveloppe atteint</label>
-          <select id="alert">${[.7,.8,.9].map(v=>`<option value="${v}" ${D.settings.alert==v?'selected':''}>${v*100} %</option>`).join('')}</select></div>
+          <select id="alert">${[.7,.8,.9].map(v=>`<option value="${v}" ${S.alert==v?'selected':''}>${v*100} %</option>`).join('')}</select></div>
         <label style="display:flex;gap:10px;align-items:flex-start;padding:4px 0 6px">
-          <input type="checkbox" id="carry" ${D.settings.carry?'checked':''} style="width:20px;height:20px;flex:none;margin-top:2px;accent-color:var(--good)">
+          <input type="checkbox" id="carry" ${S.carry?'checked':''} style="width:20px;height:20px;flex:none;margin-top:2px;accent-color:var(--good)">
           <span>Reporter le solde d'un mois sur le suivant<span class="s tiny muted" style="display:block">Ce qui reste en fin de mois vient s'ajouter au mois d'après, et un dépassement se déduit.</span></span></label>
       </div></section>
-    <section><div class="sechead"><h2>Données</h2></div>
-      <button class="btn" data-act="export">Exporter en JSON</button>
-      <button class="btn" data-act="import">Importer un fichier JSON</button>
+    <section><div class="sechead"><h2>Sauvegarde</h2></div>
+      ${backupUI}
+      <div class="card" style="padding:14px;margin-top:9px">
+        <div class="field" style="margin:0"><label for="bremind">Me rappeler de sauvegarder</label>
+          <select id="bremind">${[[0,'jamais'],[3,'après 3 jours sans sauvegarde'],[7,'après 7 jours'],[14,'après 14 jours']]
+            .map(([v,l])=>`<option value="${v}" ${(bk.remindDays??7)==v?'selected':''}>${l}</option>`).join('')}</select></div>
+      </div>
+      <div class="rowbtns" style="margin-top:9px">
+        <button class="btn" data-act="export">Exporter</button>
+        <button class="btn" data-act="import">Importer</button></div>
+    </section>
+    <section><div class="sechead"><h2>${labelOf(cur)}</h2></div>
       <button class="btn" data-act="close">${m.closed?'Rouvrir ce mois':'Clôturer ce mois'}</button>
+      <div class="tiny muted" style="margin:9px 2px 0">Clôturer verrouille le mois : plus d'ajout ni de modification de dépense, et les changements d'enveloppe, de récurrence ou de salaire ne le réécrivent plus — ses chiffres restent ceux que tu as réellement vécus. Le solde continue d'être reporté sur le mois suivant. Ce n'est pas obligatoire.</div>
+    </section>
+    <section><div class="sechead"><h2>Effacer</h2></div>
       <button class="btn ghost danger" data-act="reset">Tout effacer</button>
-      <div class="tiny muted" style="margin:10px 2px 0">Données enregistrées uniquement sur cet appareil${persistent?'':' (enregistrement indisponible)'}. Exporte de temps en temps pour ne rien perdre.</div>
+      <div class="tiny muted" style="margin:10px 2px 0">Données enregistrées sur cet appareil${persistent?'':' (enregistrement indisponible)'}${dirH?' et dans '+esc(dirH.name):''}.</div>
     </section>`;
 }
 
@@ -507,17 +759,105 @@ function expenseSheet(id){
     const d=w.querySelector('#del');if(d)d.onclick=()=>{m.expenses=m.expenses.filter(x=>x.id!==e.id);save();w.remove();render();toast('Dépense supprimée')};
   });
 }
+function salarySheet(){
+  const s=SAL();
+  const st={net:+s.net||0,months:+s.months||12,mode:s.mode||'reel',label:s.bonusLabel||'13ᵉ mois',
+    parts:(s.parts||[]).map(p=>({month:+p.month,amount:+p.amount||0})),custom:false};
+  if(st.months>12&&!st.parts.length)st.parts=[{month:6,amount:0},{month:11,amount:0}];
+  if(st.months<=12&&st.parts.length)st.months=13;
+
+  const dec=v=>v?String(v).replace('.',','):'';
+  sheet('Salaire',`
+    <div class="field"><label for="net">Net mensuel</label>
+      <input class="bigamount num" id="net" inputmode="decimal" placeholder="0,00" value="${dec(st.net)}"></div>
+    <div class="field"><label>Combien de mois par an ?</label><div class="chips" id="nb"></div></div>
+    <div id="dyn"></div>
+    <div class="tile" id="tot" style="margin:16px 0 14px"></div>
+    <button class="btn primary" id="ok">Enregistrer</button>
+    <div class="tiny muted" style="margin-top:12px">S'applique à ${labelOf(cur)} et aux mois suivants ; les mois passés gardent le salaire réellement perçu. Pour une variation exceptionnelle (heures supplémentaires, prime), ajoute plutôt un revenu à part.</div>`,
+  w=>{
+    const q=s=>w.querySelector(s);
+    const readNet=()=>{st.net=num(q('#net').value)};
+    /* #dyn est reconstruit à chaque changement : on relit les champs avant. */
+    const readParts=()=>{
+      w.querySelectorAll('.pamt').forEach(i=>{
+        const p=st.parts.find(x=>x.month===+i.dataset.m);if(p)p.amount=num(i.value)});
+      const l=q('#blab');if(l)st.label=l.value;
+    };
+    /* Sans saisie manuelle, les mois supplémentaires se répartissent à parts égales. */
+    const spread=()=>{
+      if(st.custom||st.months<=12)return;
+      const extra=r2(st.net*(st.months-12)),n=st.parts.length||1;
+      st.parts.forEach(p=>p.amount=r2(extra/n));
+    };
+    const total=()=>{
+      const bt=st.parts.reduce((a,p)=>a+p.amount,0),yr=r2(st.net*12+(st.months>12?bt:0));
+      q('#tot').innerHTML=`<div class="k">Total annuel net</div><div class="v serif num">${eur(yr)}</div>
+        <div class="tiny muted" style="margin-top:3px">soit ${eur(yr/12)} par mois en moyenne${st.months>12&&bt?` · dont ${eur(bt)} de mois supplémentaires`:''}</div>`;
+    };
+    function draw(){
+      q('#nb').innerHTML=[12,13,14].map(n=>`<button type="button" class="chip" data-nb="${n}" aria-pressed="${st.months===n}">${n} mois</button>`).join('');
+      st.parts.sort((a,b)=>a.month-b.month);
+      q('#dyn').innerHTML=st.months<=12?'':`
+        <div class="field"><label>Versé en</label><div class="chips">${
+          MONTHSHORT.map((nm,i)=>`<button type="button" class="chip sm" data-mo="${i+1}" aria-pressed="${st.parts.some(p=>p.month===i+1)}" aria-label="${MONTHNAMES[i]}">${nm}</button>`).join('')}</div>
+          <div class="tiny muted" style="margin-top:7px">Touche un mois pour l'ajouter ou l'enlever : le complément peut tomber sur n'importe quels mois, en une ou plusieurs fois, et chaque montant reste modifiable.</div></div>
+        <div class="field"><label for="blab">Nom du complément</label>
+          <input id="blab" value="${esc(st.label)}" placeholder="13ᵉ mois, prime de vacances…"></div>
+        ${st.parts.map(p=>`<div class="field"><label for="pa${p.month}">Versé en ${MONTHNAMES[p.month-1]}</label>
+          <input id="pa${p.month}" class="num pamt" data-m="${p.month}" inputmode="decimal" value="${dec(p.amount)}"></div>`).join('')}
+        <div class="field"><label>Dans le budget mensuel</label><div class="chips">
+          <button type="button" class="chip" data-md="reel" aria-pressed="${st.mode==='reel'}">Aux mois réels</button>
+          <button type="button" class="chip" data-md="lisse" aria-pressed="${st.mode==='lisse'}">Lissé sur 12 mois</button></div>
+          <div class="tiny muted" style="margin-top:7px">${st.mode==='reel'
+            ?'Le complément apparaît comme revenu en '+(frList(st.parts.map(p=>MONTHNAMES[p.month-1]))||'les mois choisis')+', où le reste à vivre sera donc plus élevé.'
+            :'Un douzième est ajouté chaque mois : le budget reste stable toute l\'année, mais les versements réels n\'apparaissent plus tels quels.'}</div></div>`;
+      wire();total();
+    }
+    function wire(){
+      w.querySelectorAll('[data-nb]').forEach(b=>b.onclick=()=>{
+        readNet();readParts();st.months=+b.dataset.nb;st.custom=false;
+        if(st.months>12&&!st.parts.length)st.parts=[{month:6,amount:0},{month:11,amount:0}];
+        spread();draw();});
+      w.querySelectorAll('[data-mo]').forEach(b=>b.onclick=()=>{
+        readNet();readParts();const mo=+b.dataset.mo;
+        const i=st.parts.findIndex(p=>p.month===mo);
+        if(i>=0){if(st.parts.length>1)st.parts.splice(i,1)}else st.parts.push({month:mo,amount:0});
+        spread();draw();});
+      w.querySelectorAll('[data-md]').forEach(b=>b.onclick=()=>{readNet();readParts();st.mode=b.dataset.md;draw()});
+      w.querySelectorAll('.pamt').forEach(i=>i.oninput=()=>{st.custom=true;readParts();total()});
+    }
+    q('#net').oninput=()=>{
+      readNet();
+      if(!st.custom){spread();w.querySelectorAll('.pamt').forEach(i=>{
+        const p=st.parts.find(x=>x.month===+i.dataset.m);if(p)i.value=dec(p.amount)})}
+      total();
+    };
+    q('#ok').onclick=()=>{
+      readNet();readParts();
+      Object.assign(SAL(),{net:r2(st.net),months:st.months,mode:st.mode,
+        bonusLabel:st.label.trim()||'13ᵉ mois',
+        parts:st.months>12?st.parts.filter(p=>p.amount>0).map(p=>({month:p.month,amount:r2(p.amount)})):[]});
+      syncSalaryForward();save();w.remove();render();toast('Salaire enregistré');
+    };
+    draw();
+  });
+}
 function incomeSheet(id){
   const m=ensureMonth(cur);const i=id?m.incomes.find(x=>x.id===id):null;
   sheet(i?'Modifier le revenu':'Nouveau revenu',`
-    <div class="field"><label for="l">Libellé</label><input id="l" value="${esc(i?i.label:'')}" placeholder="Salaire net, prime, remboursement…"></div>
+    <div class="field"><label for="l">Libellé</label><input id="l" value="${esc(i?i.label:'')}" placeholder="Prime, remboursement, allocation…"></div>
     <div class="field"><label for="a">Montant</label><input id="a" inputmode="decimal" class="num" value="${i?String(i.amount).replace('.',','):''}"></div>
+    <label style="display:flex;gap:10px;align-items:flex-start;padding:6px 0 14px">
+      <input type="checkbox" id="kp" ${!i||i.keep!==false?'checked':''} style="width:20px;height:20px;flex:none;margin-top:2px;accent-color:var(--good)">
+      <span>Reprendre chaque mois<span class="s tiny muted" style="display:block">Décoche pour un revenu exceptionnel, qui ne concerne que ${labelOf(cur)}.</span></span></label>
     <button class="btn primary" id="ok">Enregistrer</button>
-    ${i&&m.incomes.length>1?'<button class="btn ghost danger" id="del">Supprimer</button>':''}
-    <div class="tiny muted" style="margin-top:12px">Les revenus sont repris automatiquement sur le mois suivant.</div>`,
+    ${i?'<button class="btn ghost danger" id="del">Supprimer</button>':''}
+    <div class="tiny muted" style="margin-top:12px">Le salaire se règle à part, dans la ligne Salaire.</div>`,
   w=>{
     w.querySelector('#ok').onclick=()=>{
-      const o={label:w.querySelector('#l').value.trim()||'Revenu',amount:+num(w.querySelector('#a').value).toFixed(2)};
+      const o={label:w.querySelector('#l').value.trim()||'Revenu',amount:r2(num(w.querySelector('#a').value)),
+        keep:w.querySelector('#kp').checked};
       if(i)Object.assign(i,o);else m.incomes.push({id:uid(),...o});
       save();w.remove();render();
     };
@@ -592,20 +932,190 @@ function recSheet(id){
   });
 }
 
+/* ============ sauvegarde fichier ============
+   Principe : on demande une fois un dossier du téléphone, on garde la
+   permission (FileSystemDirectoryHandle stocké en IndexedDB) et on y écrit
+   budget.json à chaque modification. À l'ouverture, si le fichier est plus
+   récent que les données locales, on propose de le récupérer — c'est ce qui
+   permet de retrouver son budget après une réinstallation, ou de le partager
+   entre deux appareils via un dossier synchronisé (Drive, Syncthing…). */
+const FS_OK=typeof window.showDirectoryPicker==='function';
+const SHARE_OK=!!(navigator.canShare&&navigator.share);
+/* `booting` bloque toute écriture tant qu'on n'a pas lu le fichier existant :
+   sans lui, une modification faite dans la première seconde pourrait écraser
+   une sauvegarde qu'on n'a pas encore comparée. */
+let dirH=null, bTimer=null, needAuth=false, booting=true, dailyArmed=false;
+
+function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('budget.fs',1);
+  r.onupgradeneeded=()=>{r.result.createObjectStore('h')};
+  r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function idbGet(k){try{const db=await idb();return await new Promise(res=>{
+  const q=db.transaction('h').objectStore('h').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>res(null)})}catch(e){return null}}
+async function idbPut(k,v){try{const db=await idb();return await new Promise(res=>{
+  const q=db.transaction('h','readwrite').objectStore('h').put(v,k);q.onsuccess=()=>res(true);q.onerror=()=>res(false)})}catch(e){return false}}
+async function idbDel(k){try{const db=await idb();db.transaction('h','readwrite').objectStore('h').delete(k)}catch(e){}}
+
+/* requestPermission() exige un geste de l'utilisateur : `ask` distingue les
+   actions déclenchées par un bouton des écritures automatiques. */
+async function granted(h,mode,ask){
+  if(!h||!h.queryPermission)return !!h;
+  try{
+    if(await h.queryPermission({mode})==='granted')return true;
+    if(!ask)return false;
+    return await h.requestPermission({mode})==='granted';
+  }catch(e){return false}
+}
+const backupName=()=>D.settings.backup.name||'budget.json';
+async function fileH(create,ask){
+  if(!dirH)return null;
+  if(!await granted(dirH,'readwrite',ask))return null;
+  try{return await dirH.getFileHandle(backupName(),{create:!!create})}catch(e){return null}
+}
+async function writeBackup(ask){
+  if(!dirH)return false;
+  try{
+    const fh=await fileH(true,ask);if(!fh)return false;
+    const w=await fh.createWritable();
+    await w.write(JSON.stringify(D,null,2));
+    await w.close();
+    D.settings.backup.lastAt=new Date().toISOString();
+    needAuth=false;saveLocal();
+    if(ask)toast('Sauvegardé dans '+dirH.name);
+    refreshSettings();
+    return true;
+  }catch(e){if(ask)toast("Écriture impossible dans ce dossier");return false}
+}
+function queueBackup(){
+  if(!dirH||booting||D.settings.backup.auto===false)return;
+  clearTimeout(bTimer);bTimer=setTimeout(()=>writeBackup(false),1200);
+}
+const isBudget=p=>!!(p&&typeof p==='object'&&Array.isArray(p.categories)&&p.categories.length&&p.months&&typeof p.months==='object');
+async function readBackup(ask){
+  const fh=await fileH(false,ask);if(!fh)return null;
+  try{const t=await (await fh.getFile()).text();const p=JSON.parse(t);return isBudget(p)?p:null}
+  catch(e){return null}
+}
+function adopt(p,msg){
+  D=p;migrate();cur=thisKey();ensureMonth(cur);
+  applyTheme(D.settings.theme,D.settings.mode);
+  save({backup:false});render();toast(msg);
+}
+const hasData=()=>Object.keys(D.months||{}).some(k=>{const m=D.months[k];
+  return m.expenses.length||m.incomes.some(i=>i.amount)});
+
+async function chooseFolder(){
+  let h;
+  try{h=await showDirectoryPicker({id:'budget',mode:'readwrite',startIn:'documents'})}
+  catch(e){return}
+  dirH=h;await idbPut('dir',h);needAuth=false;booting=false;
+  /* Le dossier remplace le téléchargement quotidien : un seul fichier réécrit,
+     pas de copies datées qui s'accumulent en parallèle. */
+  D.settings.backup.auto=true;
+  D.settings.backup.daily=false;
+  dailyArmed=false;
+  /* Le dossier contient peut-être déjà un budget : les deux réponses effacent
+     quelque chose, alors on dit laquelle efface quoi. */
+  const p=await readBackup(true);
+  if(p&&p.updatedAt&&(!hasData()||confirm('Ce dossier contient déjà une sauvegarde ('+whenTxt(p.updatedAt)+').\n\nOK : la récupérer sur cet appareil, en remplaçant les données actuelles.\nAnnuler : garder cet appareil et remplacer la sauvegarde du dossier.'))){
+    adopt(p,'Données récupérées');return;
+  }
+  await writeBackup(true);render();
+}
+async function bootBackup(){
+  if(!FS_OK){booting=false;return}
+  dirH=await idbGet('dir');
+  if(!dirH){booting=false;return}
+  if(!await granted(dirH,'readwrite',false)){needAuth=true;booting=false;refreshSettings();return}
+  const p=await readBackup(false);
+  booting=false;
+  if(!p){queueBackup();return}                       // pas encore de fichier : on l'écrit
+  /* Appareil vierge (réinstallation, nouveau téléphone) : on récupère le fichier
+     sans rien demander. L'horodatage ne sert qu'à départager deux vraies
+     versions — il ne doit pas faire écraser la sauvegarde par un budget vide. */
+  if(!hasData()){adopt(p,'Données récupérées du dossier');return}
+  const mine=D.updatedAt||'',theirs=p.updatedAt||'';
+  if(theirs>mine){
+    if(confirm('La sauvegarde du dossier est plus récente ('+whenTxt(theirs)+'). Récupérer ces données ? Ce qui est sur cet appareil sera remplacé.'))
+      adopt(p,'Données récupérées du dossier');
+  }else if(mine>theirs)queueBackup();
+}
+async function reconnectFolder(){
+  if(!dirH)return;
+  if(await granted(dirH,'readwrite',true)){needAuth=false;await bootBackup();refreshSettings();toast('Dossier reconnecté')}
+  else toast('Accès refusé');
+}
+async function forgetFolder(){
+  dirH=null;needAuth=false;await idbDel('dir');render();toast('Dossier oublié');
+}
+function whenTxt(iso){
+  const h=(Date.now()-new Date(iso))/36e5;
+  if(!isFinite(h))return 'date inconnue';
+  if(h<1)return "à l'instant";
+  if(h<24)return 'il y a '+Math.max(1,Math.round(h))+' h';
+  const j=Math.floor(h/24);
+  return j===1?'hier':'il y a '+j+' jours';
+}
+function backupAge(){const l=D.settings.backup.lastAt;return l?Math.floor((Date.now()-new Date(l))/864e5):null}
+function backupLate(){
+  if(!hasData())return false;
+  const rd=D.settings.backup.remindDays??7;   // 0 = jamais : ?? et non || pour ne pas le retomber sur 7
+  if(!rd)return false;
+  const a=backupAge();
+  return a===null||a>=rd;
+}
+function refreshSettings(){if(view==='reglages'&&!document.querySelector('.sheetwrap'))render()}
+
+/* ---- repli sans API fichier (Firefox, Safari iOS) ----
+   Pas de dossier accessible, donc pas de réécriture silencieuse possible. Le
+   plus proche d'une sauvegarde automatique reste le téléchargement : il atterrit
+   dans le dossier Téléchargements du téléphone. On l'arme au premier appui de la
+   journée plutôt qu'au chargement, parce qu'un téléchargement sans geste de
+   l'utilisateur est souvent bloqué par le navigateur. */
+function armDailyBackup(){
+  const bk=D.settings.backup;
+  /* FS_OK : ce navigateur sait écrire dans un dossier, c'est la seule sauvegarde
+     automatique qu'on y fait. Sinon un réglage laissé actif sur un navigateur
+     sans API déposerait des copies datées jusque dans Chrome. */
+  if(FS_OK||dirH||!bk.daily||!hasData())return;
+  const since=bk.lastAt?Date.now()-new Date(bk.lastAt):Infinity;
+  if(since<20*36e5)return;                  // déjà sauvegardé aujourd'hui
+  dailyArmed=true;
+}
+function fireDailyBackup(){
+  if(!dailyArmed)return;
+  dailyArmed=false;
+  /* Appelé depuis le gestionnaire de clic global : un téléchargement refusé par
+     le navigateur ne doit pas empêcher l'appui d'agir. */
+  try{exportJSON(true)}catch(e){}           // synchrone : on reste dans le geste
+}
+
+/* La feuille de partage permet d'envoyer le fichier vers Fichiers, Drive… */
+async function shareBackup(){
+  const file=new File([JSON.stringify(D,null,2)],backupName(),{type:'application/json'});
+  if(!(SHARE_OK&&navigator.canShare({files:[file]})))return exportJSON();
+  try{
+    await navigator.share({files:[file],title:'Sauvegarde Budget'});
+    D.settings.backup.lastAt=new Date().toISOString();saveLocal();refreshSettings();
+  }catch(e){}
+}
+
 /* ============ actions ============ */
-function exportJSON(){
+function exportJSON(auto){
   const b=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(b);
   a.download='budget-'+new Date().toISOString().slice(0,10)+'.json';
-  document.body.appendChild(a);a.click();a.remove();toast('Fichier exporté');
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);
+  D.settings.backup.lastAt=new Date().toISOString();saveLocal();refreshSettings();
+  toast(auto?'Sauvegarde du jour téléchargée':'Fichier exporté');
 }
 function importJSON(){
   const i=el('<input type="file" accept="application/json,.json" class="hidden">');
   document.body.appendChild(i);
   i.onchange=()=>{const f=i.files[0];if(!f)return;const r=new FileReader();
-    r.onload=()=>{try{const p=JSON.parse(r.result);if(!p.categories)throw 0;
+    r.onload=()=>{try{const p=JSON.parse(r.result);if(!isBudget(p))throw 0;
       if(!confirm('Remplacer les données actuelles par ce fichier ?'))return;
-      D=p;save();render();toast('Données importées');}catch(e){alert("Ce fichier n'est pas une sauvegarde valide.")}
+      adopt(p,'Données importées');}catch(e){alert("Ce fichier n'est pas une sauvegarde valide.")}
       i.remove()};
     r.readAsText(f)};
   i.click();
@@ -614,19 +1124,36 @@ function bind(){
   const f=$('#filter');if(f)f.onchange=()=>{filterCat=f.value;render()};
   const al=$('#alert');if(al)al.onchange=()=>{D.settings.alert=+al.value;save();render()};
   const cy=$('#carry');if(cy)cy.onchange=()=>{D.settings.carry=cy.checked;save();render()};
+  const ba=$('#bauto');if(ba)ba.onchange=()=>{D.settings.backup.auto=ba.checked;save();if(ba.checked)writeBackup(true)};
+  const br=$('#bremind');if(br)br.onchange=()=>{D.settings.backup.remindDays=+br.value;save();render()};
+  const bd=$('#bdaily');if(bd)bd.onchange=()=>{
+    D.settings.backup.daily=bd.checked;save();
+    if(bd.checked)exportJSON(true);        // première sauvegarde tout de suite
+    render();
+  };
 }
 document.addEventListener('click',ev=>{
+  fireDailyBackup();
   const g=s=>ev.target.closest(s);
   let t;
   if(t=g('[data-nav]')){cur=shiftKey(cur,+t.dataset.nav);ensureMonth(cur);render();return}
   if(t=g('[data-tab]')){view=t.dataset.tab;render();window.scrollTo(0,0);return}
   if(t=g('[data-goto]')){cur=t.dataset.goto;view='mois';render();return}
   if(t=g('[data-cat]')){filterCat=t.dataset.cat;view='depenses';render();return}
-  if(t=g('[data-exp]')){expenseSheet(t.dataset.exp);return}
-  if(t=g('[data-income]')){incomeSheet(t.dataset.income);return}
+  if(t=g('[data-exp]')){
+    if(D.months[cur].closed)return toast('Mois clôturé — rouvre-le pour modifier');
+    expenseSheet(t.dataset.exp);return}
+  if(t=g('[data-salary]')){
+    if(D.months[cur].closed)return toast('Mois clôturé — rouvre-le pour modifier');
+    salarySheet();return}
+  if(t=g('[data-income]')){
+    if(D.months[cur].closed)return toast('Mois clôturé — rouvre-le pour modifier');
+    incomeSheet(t.dataset.income);return}
   if(t=g('[data-catedit]')){catSheet(t.dataset.catedit);return}
   if(t=g('[data-rec]')){recSheet(t.dataset.rec);return}
   if(t=g('[data-unlock]')){D.months[cur].closed=false;save();render();return}
+  if(t=g('[data-theme]')){D.settings.theme=t.dataset.theme;applyTheme(D.settings.theme,D.settings.mode);save();render();return}
+  if(t=g('[data-mode]')){D.settings.mode=t.dataset.mode;applyTheme(D.settings.theme,D.settings.mode);save();render();return}
   if(t=g('[data-act]')){
     const a=t.dataset.act;
     if(a==='income-add')incomeSheet();
@@ -634,8 +1161,20 @@ document.addEventListener('click',ev=>{
     else if(a==='rec-add')recSheet();
     else if(a==='export')exportJSON();
     else if(a==='import')importJSON();
+    else if(a==='bfolder')chooseFolder();
+    else if(a==='bsave')writeBackup(true);
+    else if(a==='reauth')reconnectFolder();
+    else if(a==='bshare')shareBackup();
+    else if(a==='bforget'){if(confirm('Oublier ce dossier ? Le fichier déjà écrit reste en place, mais la sauvegarde automatique s\'arrête.'))forgetFolder()}
+    else if(a==='bload')(async()=>{
+      const p=await readBackup(true);
+      if(!p)return toast('Aucune sauvegarde lisible dans ce dossier');
+      if(confirm('Remplacer les données de cet appareil par la sauvegarde du '+new Date(p.updatedAt||Date.now()).toLocaleString('fr-FR')+' ?'))adopt(p,'Données récupérées');
+    })();
     else if(a==='close'){D.months[cur].closed=!D.months[cur].closed;save();render();toast(D.months[cur].closed?'Mois clôturé':'Mois rouvert')}
-    else if(a==='reset'){if(confirm('Effacer toutes les données, y compris les mois passés ?')){D=defaults();save();cur=thisKey();render()}}
+    else if(a==='reset'){if(confirm('Effacer toutes les données, y compris les mois passés ?')){
+      const th=D.settings.theme,md=D.settings.mode;
+      D=defaults();D.settings.theme=th;D.settings.mode=md;save();cur=thisKey();ensureMonth(cur);render()}}
   }
 });
 $('#fab').onclick=()=>expenseSheet();
@@ -654,9 +1193,22 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;
   setTimeout(()=>b.remove(),12000);
 });
 
+/* Le mois courant existe peut-être déjà sans les lignes de salaire à jour
+   (profil modifié le mois dernier, mois créé avant la mise à jour). */
 ensureMonth(cur);
+if(!D.months[cur].closed){
+  const before=JSON.stringify(D.months[cur].incomes);
+  syncSalary(D.months[cur],cur);
+  if(JSON.stringify(D.months[cur].incomes)!==before)save();
+}
+applyTheme(D.settings.theme,D.settings.mode);
 if(!persistent)$('#storewarn').classList.remove('hidden');
 render();
+bootBackup().then(armDailyBackup);
+/* Dernière chance d'écrire le fichier quand l'app passe en arrière-plan. */
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='hidden'&&dirH&&!booting&&D.settings.backup.auto!==false){clearTimeout(bTimer);writeBackup(false)}
+});
 </script>
 </body>
 </html>
