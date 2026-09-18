@@ -14,12 +14,40 @@ Installer l'app (plutôt que l'ouvrir dans un onglet) n'est pas cosmétique : c'
 qui permet à Chrome de conserver durablement l'autorisation d'écrire dans le dossier
 de sauvegarde.
 
+## Organisation de l'app (v1.2)
+
+Quatre onglets, chacun avec un seul rôle, et les réglages derrière ⚙️ :
+
+| Onglet | Rôle | Contenu |
+| --- | --- | --- |
+| **Mois** | Où j'en suis | Reste à vivre, projection de fin de mois, alertes, enveloppes (un appui ouvre la fiche de la catégorie), ce qui reste « À venir », dernières opérations ; pour un mois terminé, son bilan et *Clôturer*. Glisser à gauche ou à droite change de mois. |
+| **Opérations** | Ce qui s'est passé | Dépenses **et** revenus du mois, par jour, avec recherche, filtres, et ce qui est prévu en tête. |
+| **Analyse** | Comprendre | Vue *Mois* (où part l'argent, comparaison avec les 3 mois précédents) et vue *Année* (revenus et dépenses mois par mois, pics du 13ᵉ mois, statistiques). |
+| **Budget** | Mon plan | Salaire, revenus réguliers, dépenses fixes avec leur jour de prélèvement, épargne programmée, enveloppes, catégories. En tête : ce qui reste à attribuer. |
+| ⚙️ | Préférences | Apparence, alertes et report, sauvegarde, données. |
+
+Le sélecteur de mois n'apparaît que sur Mois, Opérations et Analyse. Le plan (onglet
+Budget) s'applique toujours **à partir du mois en cours** ; les mois passés et
+clôturés gardent ce qui s'est réellement passé.
+
+**Enveloppes = dépenses variables.** Une enveloppe ne compte que les dépenses
+variables de sa catégorie ; les dépenses fixes sont suivies à part. C'est ce qui rend
+juste le calcul « revenus − dépenses fixes − enveloppes − épargne = non attribué ».
+Une enveloppe se modifie *ce mois-ci seulement* ou *à partir de ce mois*.
+
+**Saisie.** Le bouton + ajoute une dépense ou un revenu. Les dépenses répétées (même
+libellé et même montant au moins deux fois en 3 mois) deviennent des favoris ajoutés
+en un appui ; un libellé déjà connu retrouve sa catégorie. Supprimer ou ajouter ne
+demande pas de confirmation : un message propose « Annuler » pendant quelques
+secondes. Sur Android, un appui long sur l'icône propose « Ajouter une dépense »
+(raccourci du manifeste, `index.html?add=1`).
+
 ## Salaire
 
-Réglages → Revenus → la ligne Salaire. Le salaire est un **profil annuel**, pas un
+Budget → la ligne Salaire. Le salaire est un **profil annuel**, pas un
 montant recopié chaque mois :
 
-- un net mensuel ;
+- un net mensuel, et son jour de versement (28 par défaut) ;
 - un nombre de mois par an (12, 13, 14) ;
 - le ou les **mois de versement, libres** : n'importe quels mois, en une ou
   plusieurs fois. Juin et novembre ne sont qu'un pré-remplissage quand on passe à
@@ -34,13 +62,13 @@ Deux façons de le compter :
 | Aux mois réels | Le complément apparaît comme revenu sur les mois de versement, où le reste à vivre est donc plus élevé. |
 | Lissé sur 12 mois | Un douzième est ajouté chaque mois : budget stable, mais les versements réels n'apparaissent plus tels quels. |
 
-Une modification s'applique au mois affiché et aux suivants ; les mois passés gardent
+Une modification s'applique à partir du mois en cours ; les mois passés gardent
 ce qui a réellement été perçu. Les revenus exceptionnels (heures supplémentaires,
 prime) s'ajoutent à part, avec la case « Reprendre chaque mois » décochée.
 
 ## Apparence
 
-Réglages → Apparence : mode sombre ou clair, et huit teintes (vert, océan, bleu,
+⚙️ → Apparence : mode sombre ou clair, et huit teintes (vert, océan, bleu,
 violet, rose, rouge, ambre, graphite). Toute la palette — fonds, textes, accents —
 est calculée à partir d'une teinte et d'un mode par `palette()`, en haut du fichier ;
 ajouter une variante tient en une ligne dans le tableau `THEMES`. Les 16 combinaisons
@@ -78,14 +106,16 @@ partie du *shell* mis en cache, sinon l'ancienne reste servie.
 
 ## Clôturer un mois
 
-Facultatif. Clôturer verrouille le mois : plus d'ajout ni de modification de dépense
-ou de revenu, et les changements d'enveloppe, de récurrence ou de salaire ne le
-réécrivent plus — ses chiffres restent ceux qu'on a réellement vécus. Le report de
-solde vers le mois suivant continue de fonctionner. Réversible à tout moment.
+Facultatif. Un mois terminé et pas encore clôturé affiche, en haut de l'écran Mois,
+son bilan (mis de côté, reste, enveloppes tenues) et le bouton *Clôturer*. Clôturer
+verrouille le mois : plus d'ajout ni de modification de dépense ou de revenu, et les
+changements de budget ne le réécrivent plus — ses chiffres restent ceux qu'on a
+réellement vécus. Le report de solde vers le mois suivant continue de fonctionner.
+Réversible à tout moment (« Rouvrir »).
 
 ## Sauvegarde
 
-Réglages → Sauvegarde.
+⚙️ → Sauvegarde.
 
 - **Chrome (Android 132+, ordinateur)** : « Choisir un dossier de sauvegarde », une
   fois, n'importe où. L'app y écrit **un seul `budget.json`, réécrit** à chaque
@@ -116,20 +146,21 @@ Réglages → Sauvegarde.
 
 ```
 {
-  v: 2,
+  v: 3,
   updatedAt: "2026-09-12T…",        // départage appareil et fichier de sauvegarde
   settings: {
     alert, carry, theme, mode,
-    salary: { label, net, months, mode: "reel"|"lisse", bonusLabel,
+    salary: { label, net, months, mode: "reel"|"lisse", bonusLabel, payDay,
               parts: [{ month, amount }, …] },   // mois libres, montants libres
     backup: { auto, daily, name, lastAt, remindDays }
   },
-  categories: [...],
-  recurring: [...],
+  categories: [ { id, name, emoji, budget, parent, save? } ],
+  recurring: [ { id, label, amount, freq, catId, active, day } ],  // dépenses fixes et épargne programmée
   months: {
     "2026-09": {
-      incomes: [ { id, sid?, label, amount, keep? } ],   // sid = ligne issue du profil de salaire
-      budgets: {}, expenses: [], closed: false
+      incomes:  [ { id, sid?, label, amount, keep?, date } ],   // sid = ligne issue du profil de salaire
+      expenses: [ { id, label, amount, catId, date, rid? } ],    // rid = occurrence d'une dépense fixe
+      budgets: { catId: montant }, closed: false
     }
   }
 }
@@ -138,6 +169,11 @@ Réglages → Sauvegarde.
 Les lignes de revenu portant un `sid` sont régénérées depuis le profil de salaire ;
 celles sans `sid` sont saisies à la main et ne sont jamais réécrites. `keep: false`
 marque un revenu qui ne doit pas être reporté au mois suivant.
+
+Tout mouvement a une date : ce qui est daté après aujourd'hui apparaît « À venir »
+(dépenses fixes à leur jour, salaire à son jour de versement), et compte déjà dans le
+reste à vivre du mois. La migration v2 → v3 place les dépenses fixes existantes au
+1er (comme avant), le salaire au 28 et les autres revenus au 1er.
 
 Le dossier de sauvegarde (un `FileSystemDirectoryHandle`) est conservé dans
 IndexedDB, base `budget.fs` — il ne peut pas être stocké dans `localStorage`.
