@@ -17,7 +17,8 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
 
-  // La page elle-même : réseau d'abord pour récupérer les mises à jour, cache en secours.
+  // The app page always comes from the network when online, so a new version
+  // shows up at the next launch; the saved copy keeps the app working offline.
   if (req.mode === 'navigate') {
     e.respondWith(
       fetch(req)
@@ -27,7 +28,8 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // Le reste (icônes, polices) : cache d'abord, rafraîchi en arrière-plan.
+  // Icons and fonts load instantly from the saved copy and refresh in the
+  // background.
   e.respondWith(
     caches.match(req).then(hit => {
       const net = fetch(req)

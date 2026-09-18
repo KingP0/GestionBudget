@@ -16,7 +16,6 @@
 <style>
 :root{
   color-scheme:dark;
-  /* Palette par défaut (vert sombre). Remplacée au démarrage par applyTheme(). */
   --bg:#0F2420;
   --surface:#16302A;
   --surface-2:#1C3B34;
@@ -46,7 +45,9 @@ body{
   -webkit-font-smoothing:antialiased;
   overscroll-behavior-y:none;
 }
-#app{max-width:540px;margin:0 auto;padding:0 var(--gut)}
+/* On iPhone the app runs edge to edge: content stays clear of the status bar,
+   the notch and the home indicator. */
+#app{max-width:540px;margin:0 auto;padding:0 max(var(--gut),env(safe-area-inset-right)) 0 max(var(--gut),env(safe-area-inset-left))}
 h1,h2,h3{margin:0;font-weight:600}
 button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 input,select,textarea{font:inherit;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:11px 12px;width:100%}
@@ -59,14 +60,14 @@ select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,va
 .good{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}
 .hidden{display:none!important}
 
-/* ---- entête mois ---- */
-.topbar{position:sticky;top:0;z-index:20;background:linear-gradient(var(--bg) 72%,transparent);padding:14px 0 10px;display:flex;align-items:center;gap:6px}
+/* Month header */
+.topbar{position:sticky;top:0;z-index:20;background:linear-gradient(var(--bg) 72%,transparent);padding:calc(14px + env(safe-area-inset-top)) 0 10px;display:flex;align-items:center;gap:6px}
 .topbar h1{font-size:19px;flex:1;text-align:center;text-transform:capitalize}
 .navbtn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:var(--ink-2);font-size:19px;border:1px solid var(--line)}
 .navbtn:active{background:var(--surface)}
 .navbtn[disabled]{opacity:.3}
 
-/* ---- hero ---- */
+/* Month summary card */
 .hero{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px 18px 16px;margin-bottom:14px}
 .hero .label{font-size:13.5px;color:var(--ink-2)}
 .hero .amount{font-size:52px;line-height:1.05;margin:4px 0 2px;display:block}
@@ -82,7 +83,7 @@ select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,va
 .split .k{font-size:12.5px;color:var(--ink-3)}
 .split .v{font-size:16px;margin-top:1px}
 
-/* ---- blocs ---- */
+/* Envelopes, expenses and lists */
 section{margin-bottom:22px}
 .sechead{display:flex;align-items:baseline;justify-content:space-between;margin:0 2px 9px}
 .sechead h2{font-size:17px}
@@ -138,13 +139,13 @@ section{margin-bottom:22px}
 .chip[aria-pressed="true"]{background:var(--good);color:var(--on-accent);border-color:transparent;font-weight:600}
 .chip.sm{padding:6px 10px;font-size:12.5px}
 
-/* ---- choix du thème ---- */
+/* Theme picker */
 .swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
 .sw{border:1px solid var(--line);border-radius:13px;padding:11px 3px 8px;display:flex;flex-direction:column;align-items:center;gap:7px;font-size:10.5px;line-height:1.2}
 .sw .dot{width:22px;height:22px;border-radius:50%}
 .sw[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 
-/* ---- barre d'onglets + FAB ---- */
+/* Tab bar and add-expense button */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;background:var(--tabbg);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
 .tabs button{flex:1;padding:9px 0 10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--ink-3)}
 .tabs button svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
@@ -152,9 +153,9 @@ section{margin-bottom:22px}
 .fab{position:fixed;z-index:31;right:max(18px,calc(50% - 270px + 18px));bottom:calc(84px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:19px;background:var(--good);color:var(--on-accent);display:grid;place-items:center;font-size:28px;box-shadow:0 8px 22px var(--shadow)}
 .fab:active{transform:scale(.94)}
 
-/* ---- feuille modale ---- */
+/* Bottom sheets and notifications */
 .sheetwrap{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;background:var(--scrim)}
-.sheet{width:100%;max-width:540px;max-height:92vh;overflow-y:auto;background:var(--bg);border:1px solid var(--line);border-bottom:none;border-radius:20px 20px 0 0;padding:8px var(--gut) calc(22px + env(safe-area-inset-bottom));animation:up .22s cubic-bezier(.2,.8,.3,1)}
+.sheet{width:100%;max-width:540px;max-height:92vh;max-height:calc(100dvh - env(safe-area-inset-top) - 16px);overflow-y:auto;background:var(--bg);border:1px solid var(--line);border-bottom:none;border-radius:20px 20px 0 0;padding:8px var(--gut) calc(22px + env(safe-area-inset-bottom));animation:up .22s cubic-bezier(.2,.8,.3,1)}
 @keyframes up{from{transform:translateY(18px);opacity:.4}}
 @media (prefers-reduced-motion:reduce){.sheet{animation:none}.pace .fill{transition:none}}
 .grab{width:38px;height:4px;border-radius:3px;background:var(--line);margin:6px auto 12px}
@@ -165,14 +166,13 @@ section{margin-bottom:22px}
 .rowbtns{display:flex;gap:9px;margin-top:6px}
 .rowbtns .btn{margin-top:0}
 .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:20px;font-size:13.5px;font-weight:500;box-shadow:0 6px 18px var(--shadow);max-width:calc(100% - 32px);text-align:center}
-.warnbar{background:var(--warn);color:var(--on-warn);padding:9px 14px;font-size:13px;text-align:center}
+.warnbar{background:var(--warn);color:var(--on-warn);padding:calc(9px + env(safe-area-inset-top)) 14px 9px;font-size:13px;text-align:center}
 .empty{text-align:center;color:var(--ink-2);padding:26px 10px;font-size:14px}
 </style>
 <script>
-/* ============ thèmes ============
-   Un thème = une teinte + un mode (sombre/clair). Toute la palette en découle,
-   ce qui évite d'écrire 16 jeux de couleurs à la main. Ce script est dans le
-   <head> pour peindre la bonne couleur dès la première image. */
+/* Themes: eight hues, each available in dark or light mode. The whole palette
+   is derived from the hue, so every combination stays readable. The saved theme
+   is applied before the page appears, so the app never flashes the default green. */
 const THEMES=[
   {id:'vert',    name:'Vert',     h:167},
   {id:'ocean',   name:'Océan',    h:191},
@@ -218,7 +218,6 @@ function applyTheme(id,mode){
   const sb=document.querySelector('meta[name=apple-mobile-web-app-status-bar-style]');
   if(sb)sb.setAttribute('content',p.scheme==='light'?'default':'black-translucent');
 }
-/* Applique le thème enregistré avant le premier rendu. */
 try{
   const s=JSON.parse(localStorage.getItem('budget.v1')||'{}').settings||{};
   applyTheme(s.theme||'vert',s.mode||'sombre');
@@ -231,7 +230,6 @@ try{
 <button class="fab" id="fab" aria-label="Ajouter une dépense">+</button>
 <nav class="tabs" id="tabs"></nav>
 <script>
-/* ============ socle ============ */
 const $=(s,r=document)=>r.querySelector(s);
 const el=(h)=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstElementChild};
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -243,8 +241,8 @@ const esc=(s)=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'
 const KEY='budget.v1';
 let persistent=true;
 function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){persistent=false;$('#storewarn').classList.remove('hidden')}}
-/* save() horodate, écrit en local, puis programme l'écriture dans le fichier
-   de sauvegarde. `{backup:false}` évite de reboucler depuis writeBackup(). */
+/* Every change is stored on the device right away, then copied to the backup
+   folder when one is connected. */
 function save(opt){
   D.updatedAt=new Date().toISOString();
   saveLocal();
@@ -252,7 +250,6 @@ function save(opt){
 }
 function loadRaw(){try{return localStorage.getItem(KEY)}catch(e){persistent=false;$('#storewarn').classList.remove('hidden');return null}}
 
-/* ============ dates ============ */
 const pad=n=>String(n).padStart(2,'0');
 const keyOf=d=>d.getFullYear()+'-'+pad(d.getMonth()+1);
 const today=()=>new Date();
@@ -266,7 +263,8 @@ function dayLabel(iso){const d=new Date(iso+'T12:00');const t=new Date();const y
   if(d.toDateString()===y.toDateString())return "Hier";
   return new Intl.DateTimeFormat('fr-FR',{weekday:'long',day:'numeric',month:'long'}).format(d)}
 
-/* ============ données ============ */
+/* A new budget starts with everyday categories; Savings is counted apart from
+   spending. */
 function defaults(){
   const C=(id,name,emoji,budget,extra={})=>({id,name,emoji,budget,parent:null,...extra});
   return {v:2,
@@ -292,9 +290,8 @@ function defaults(){
 let D=(()=>{const r=loadRaw();if(!r)return defaults();try{const p=JSON.parse(r);return p&&p.categories?p:defaults()}catch(e){return defaults()}})();
 let cur=thisKey(), view='mois';
 
-/* ============ migration ============
-   Un fichier peut être tronqué, ancien ou venir d'une autre version : on remet
-   d'aplomb la structure avant tout le reste, sinon le rendu casse plus loin. */
+/* Data from an older version or a damaged backup file still opens: missing
+   parts are restored instead of breaking the app. */
 function repair(){
   if(!D||typeof D!=='object')D=defaults();
   if(!D.settings||typeof D.settings!=='object')D.settings={};
@@ -310,9 +307,8 @@ function repair(){
     m.closed=!!m.closed;
   });
 }
-/* v1 → v2 : le salaire devient un profil annuel (12/13/14 mois) au lieu d'une
-   ligne de revenu recopiée de mois en mois. On récupère le montant déjà saisi et
-   on marque les lignes existantes pour que rien ne soit compté deux fois. */
+/* Upgrade from the first version: the salary typed in month by month becomes
+   the yearly salary profile, without being counted twice. */
 function migrate(){
   repair();
   const s=D.settings;
@@ -354,12 +350,10 @@ const emojiOf=id=>{const c=catOf(id);return (c&&c.emoji)||(rootOf(id)||{}).emoji
 function monthlyAmount(r){return r.freq==='yearly'?r.amount/12:r.freq==='quarterly'?r.amount/3:r.amount}
 function freqLabel(r){return r.freq==='yearly'?'annuel, lissé':r.freq==='quarterly'?'trimestriel, lissé':'mensuel'}
 
-/* ============ salaire ============
-   Le salaire est un profil annuel : un net mensuel, plus d'éventuels mois
-   supplémentaires (13ᵉ, 14ᵉ) versés sur un ou plusieurs mois de l'année.
-   Chaque mois en tire ses lignes de revenu, marquées d'un `sid` : elles sont
-   régénérées quand le profil change, alors que les revenus saisis à la main
-   (primes, remboursements) ne sont jamais touchés. */
+/* Salary profile: a monthly net pay plus optional extra months (13th, 14th)
+   paid on any months of the year, counted either on the months they are paid
+   or spread evenly over twelve months. Each month's salary lines come from the
+   profile; incomes entered by hand (bonus, refund) are never changed by it. */
 const MONTHNAMES=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 const MONTHSHORT=['jan','fév','mar','avr','mai','juin','juil','août','sep','oct','nov','déc'];
 const frList=a=>a.length>1?a.slice(0,-1).join(', ')+' et '+a[a.length-1]:(a[0]||'');
@@ -386,8 +380,8 @@ function syncSalary(m,k){
     return {id:old?old.id:uid(),...w};
   }).concat(manual);
 }
-/* Un changement de profil s'applique au mois affiché et aux suivants ;
-   les mois passés et les mois clôturés gardent ce qui a réellement été perçu. */
+/* A profile change applies to the displayed month and the following ones; past
+   and closed months keep what was actually received. */
 function syncSalaryForward(){
   Object.keys(D.months).forEach(k=>{if(k>=cur&&!D.months[k].closed)syncSalary(D.months[k],k)});
 }
@@ -402,6 +396,8 @@ function salarySummary(){
   return lab+' · '+(frList(n)||'—');
 }
 
+/* A new month starts with the salary, the incomes marked as monthly, the
+   envelopes and the recurring expenses. */
 function ensureMonth(k){
   if(D.months[k])return D.months[k];
   const prev=D.months[shiftKey(k,-1)];
@@ -415,7 +411,6 @@ function ensureMonth(k){
   D.months[k]=m;save();return m;
 }
 
-/* ============ calculs ============ */
 function envOf(m,id){
   if(m.budgets[id]!=null)return m.budgets[id];
   const ks=kids(id);
@@ -431,6 +426,8 @@ function rawTotals(m){
   m.expenses.forEach(e=>{isSave(e.catId)?saving+=e.amount:expense+=e.amount});
   return {income,expense,saving};
 }
+/* Balance carry-over (optional): what is left at the end of a month is added to
+   the next one, and overspending is deducted from it. */
 function carryFor(k){
   if(!D.settings.carry)return 0;
   const keys=Object.keys(D.months).sort();let acc=0;
@@ -447,7 +444,6 @@ function totals(k){
 }
 function envTotal(m){return roots().filter(c=>!c.save).reduce((s,c)=>s+envOf(m,c.id),0)}
 
-/* ============ rendu ============ */
 function render(){
   const m=ensureMonth(cur);
   $('#app').innerHTML=topbar()+(view==='mois'?viewMois(m):view==='depenses'?viewDepenses(m):view==='recap'?viewRecap(m):viewReglages(m));
@@ -471,7 +467,8 @@ function renderTabs(){
   $('#tabs').innerHTML=T.map(([id,lb,ic])=>`<button data-tab="${id}" aria-selected="${view===id}"><svg viewBox="0 0 24 24">${ic}</svg>${lb}</button>`).join('');
 }
 
-/* ---- vue Mois ---- */
+/* Month screen: money left to live on, spending pace against the calendar,
+   envelope alerts and latest expenses. */
 function viewMois(m){
   const t=totals(cur);
   const bt=envTotal(m);
@@ -546,7 +543,8 @@ function expRow(e){
     <span class="v num">${eur(e.amount)}</span></button>`;
 }
 
-/* ---- vue Dépenses ---- */
+/* Expenses screen: every expense of the month, grouped by day, filterable by
+   category. */
 let filterCat='';
 function viewDepenses(m){
   let list=[...m.expenses];
@@ -562,7 +560,8 @@ function viewDepenses(m){
     ${html||`<div class="empty">Aucune dépense ici.</div>`}`;
 }
 
-/* ---- vue Récap ---- */
+/* Summary screen: where the money goes, comparison with the last three months
+   and the balance history. */
 function viewRecap(m){
   const t=totals(cur);
   const parts=roots().map(c=>({c,s:spentOf(m,c.id),b:envOf(m,c.id)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);
@@ -613,7 +612,9 @@ function viewRecap(m){
     ${compare}${hist}`;
 }
 
-/* ---- vue Réglages ---- */
+/* Settings screen. Backup options depend on the browser: where a folder can be
+   written (Chrome), a single budget.json is kept up to date there; elsewhere
+   (Firefox, Safari on iOS) the backup is shared or downloaded daily instead. */
 function viewReglages(m){
   const S=D.settings;
   const salL=m.incomes.filter(i=>i.sid),manL=m.incomes.filter(i=>!i.sid);
@@ -634,8 +635,6 @@ function viewReglages(m){
       <span class="dot" style="background:${p.good}"></span>${t.name}</button>`}).join('');
 
   const bk=S.backup,last=bk.lastAt?'Dernière sauvegarde '+whenTxt(bk.lastAt):'Jamais sauvegardé';
-  /* Proposé dès qu'aucun dossier n'est connecté : c'est la seule automatisation
-     possible sur Firefox et sur Safari iOS. */
   const dailyBox=`<label class="card" style="display:flex;gap:10px;align-items:flex-start;padding:14px;margin-top:9px">
       <input type="checkbox" id="bdaily" ${bk.daily?'checked':''} style="width:20px;height:20px;flex:none;margin-top:2px;accent-color:var(--good)">
       <span>Télécharger une sauvegarde chaque jour<span class="s tiny muted" style="display:block">Une fois par jour, au premier appui dans l'app : le fichier part dans le dossier Téléchargements du téléphone. Le navigateur peut demander confirmation.</span></span></label>`;
@@ -655,8 +654,6 @@ function viewReglages(m){
       <div class="rowbtns"><button class="btn ghost" data-act="bfolder">Changer de dossier</button>
         <button class="btn ghost" data-act="bforget">Oublier</button></div>`;
   }else if(FS_OK){
-    /* Pas de téléchargement quotidien proposé ici : ce navigateur sait écrire
-       dans un dossier, donc un seul fichier réécrit, sans copies datées. */
     backupUI=`<button class="btn primary" data-act="bfolder">Choisir un dossier de sauvegarde</button>
       <div class="tiny muted" style="margin:9px 2px 0">${last}. Choisis le dossier que tu veux, par exemple <i>Documents/Budget</i> : l'app y écrit <b>${esc(backupName())}</b> — un seul fichier, réécrit à chaque modification — et le relit à l'ouverture. Installe l'app sur l'écran d'accueil pour que l'autorisation soit conservée durablement.</div>`;
   }else{
@@ -718,7 +715,6 @@ function viewReglages(m){
     </section>`;
 }
 
-/* ============ feuilles modales ============ */
 function sheet(title,body,onMount){
   const w=el(`<div class="sheetwrap"><div class="sheet"><div class="grab"></div><h2>${title}</h2>${body}</div></div>`);
   w.addEventListener('click',e=>{if(e.target===w)w.remove()});
@@ -778,13 +774,13 @@ function salarySheet(){
   w=>{
     const q=s=>w.querySelector(s);
     const readNet=()=>{st.net=num(q('#net').value)};
-    /* #dyn est reconstruit à chaque changement : on relit les champs avant. */
     const readParts=()=>{
       w.querySelectorAll('.pamt').forEach(i=>{
         const p=st.parts.find(x=>x.month===+i.dataset.m);if(p)p.amount=num(i.value)});
       const l=q('#blab');if(l)st.label=l.value;
     };
-    /* Sans saisie manuelle, les mois supplémentaires se répartissent à parts égales. */
+    /* Extra months are split evenly across the payment months until an amount
+       is typed by hand. */
     const spread=()=>{
       if(st.custom||st.months<=12)return;
       const extra=r2(st.net*(st.months-12)),n=st.parts.length||1;
@@ -932,18 +928,16 @@ function recSheet(id){
   });
 }
 
-/* ============ sauvegarde fichier ============
-   Principe : on demande une fois un dossier du téléphone, on garde la
-   permission (FileSystemDirectoryHandle stocké en IndexedDB) et on y écrit
-   budget.json à chaque modification. À l'ouverture, si le fichier est plus
-   récent que les données locales, on propose de le récupérer — c'est ce qui
-   permet de retrouver son budget après une réinstallation, ou de le partager
-   entre deux appareils via un dossier synchronisé (Drive, Syncthing…). */
+/* Folder backup (Chrome). The user picks a folder once; a single budget.json is
+   rewritten there after every change, never as dated copies.
+   - At startup the file is read back: a fresh install restores it silently, and
+     a file newer than the device is restored only after the user agrees.
+   - The file is never overwritten before it has been compared with the device.
+   - If folder access is lost (app not installed), saving pauses until the user
+     grants it again with one tap.
+   - A folder synced by Drive or Syncthing shares the budget across devices. */
 const FS_OK=typeof window.showDirectoryPicker==='function';
 const SHARE_OK=!!(navigator.canShare&&navigator.share);
-/* `booting` bloque toute écriture tant qu'on n'a pas lu le fichier existant :
-   sans lui, une modification faite dans la première seconde pourrait écraser
-   une sauvegarde qu'on n'a pas encore comparée. */
 let dirH=null, bTimer=null, needAuth=false, booting=true, dailyArmed=false;
 
 function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('budget.fs',1);
@@ -955,8 +949,6 @@ async function idbPut(k,v){try{const db=await idb();return await new Promise(res
   const q=db.transaction('h','readwrite').objectStore('h').put(v,k);q.onsuccess=()=>res(true);q.onerror=()=>res(false)})}catch(e){return false}}
 async function idbDel(k){try{const db=await idb();db.transaction('h','readwrite').objectStore('h').delete(k)}catch(e){}}
 
-/* requestPermission() exige un geste de l'utilisateur : `ask` distingue les
-   actions déclenchées par un bouton des écritures automatiques. */
 async function granted(h,mode,ask){
   if(!h||!h.queryPermission)return !!h;
   try{
@@ -1008,13 +1000,11 @@ async function chooseFolder(){
   try{h=await showDirectoryPicker({id:'budget',mode:'readwrite',startIn:'documents'})}
   catch(e){return}
   dirH=h;await idbPut('dir',h);needAuth=false;booting=false;
-  /* Le dossier remplace le téléchargement quotidien : un seul fichier réécrit,
-     pas de copies datées qui s'accumulent en parallèle. */
   D.settings.backup.auto=true;
   D.settings.backup.daily=false;
   dailyArmed=false;
-  /* Le dossier contient peut-être déjà un budget : les deux réponses effacent
-     quelque chose, alors on dit laquelle efface quoi. */
+  /* If the chosen folder already holds a budget, the user decides which copy
+     is kept: the folder's or the device's. */
   const p=await readBackup(true);
   if(p&&p.updatedAt&&(!hasData()||confirm('Ce dossier contient déjà une sauvegarde ('+whenTxt(p.updatedAt)+').\n\nOK : la récupérer sur cet appareil, en remplaçant les données actuelles.\nAnnuler : garder cet appareil et remplacer la sauvegarde du dossier.'))){
     adopt(p,'Données récupérées');return;
@@ -1028,10 +1018,7 @@ async function bootBackup(){
   if(!await granted(dirH,'readwrite',false)){needAuth=true;booting=false;refreshSettings();return}
   const p=await readBackup(false);
   booting=false;
-  if(!p){queueBackup();return}                       // pas encore de fichier : on l'écrit
-  /* Appareil vierge (réinstallation, nouveau téléphone) : on récupère le fichier
-     sans rien demander. L'horodatage ne sert qu'à départager deux vraies
-     versions — il ne doit pas faire écraser la sauvegarde par un budget vide. */
+  if(!p){queueBackup();return}
   if(!hasData()){adopt(p,'Données récupérées du dossier');return}
   const mine=D.updatedAt||'',theirs=p.updatedAt||'';
   if(theirs>mine){
@@ -1056,40 +1043,37 @@ function whenTxt(iso){
   return j===1?'hier':'il y a '+j+' jours';
 }
 function backupAge(){const l=D.settings.backup.lastAt;return l?Math.floor((Date.now()-new Date(l))/864e5):null}
+/* Backup reminder: a banner on the Month screen after a chosen number of days
+   without a backup (or never). */
 function backupLate(){
   if(!hasData())return false;
-  const rd=D.settings.backup.remindDays??7;   // 0 = jamais : ?? et non || pour ne pas le retomber sur 7
+  const rd=D.settings.backup.remindDays??7;
   if(!rd)return false;
   const a=backupAge();
   return a===null||a>=rd;
 }
 function refreshSettings(){if(view==='reglages'&&!document.querySelector('.sheetwrap'))render()}
 
-/* ---- repli sans API fichier (Firefox, Safari iOS) ----
-   Pas de dossier accessible, donc pas de réécriture silencieuse possible. Le
-   plus proche d'une sauvegarde automatique reste le téléchargement : il atterrit
-   dans le dossier Téléchargements du téléphone. On l'arme au premier appui de la
-   journée plutôt qu'au chargement, parce qu'un téléchargement sans geste de
-   l'utilisateur est souvent bloqué par le navigateur. */
+/* Daily download, for browsers that cannot write to a folder (Firefox, Safari
+   on iOS). Once a day, on the first tap in the app, a dated backup is saved to
+   the phone's Downloads folder; it waits for a tap because browsers block
+   downloads the user did not trigger. A blocked download never stops that tap
+   from working. It never runs where folder backup is available. */
 function armDailyBackup(){
   const bk=D.settings.backup;
-  /* FS_OK : ce navigateur sait écrire dans un dossier, c'est la seule sauvegarde
-     automatique qu'on y fait. Sinon un réglage laissé actif sur un navigateur
-     sans API déposerait des copies datées jusque dans Chrome. */
   if(FS_OK||dirH||!bk.daily||!hasData())return;
   const since=bk.lastAt?Date.now()-new Date(bk.lastAt):Infinity;
-  if(since<20*36e5)return;                  // déjà sauvegardé aujourd'hui
+  if(since<20*36e5)return;
   dailyArmed=true;
 }
 function fireDailyBackup(){
   if(!dailyArmed)return;
   dailyArmed=false;
-  /* Appelé depuis le gestionnaire de clic global : un téléchargement refusé par
-     le navigateur ne doit pas empêcher l'appui d'agir. */
-  try{exportJSON(true)}catch(e){}           // synchrone : on reste dans le geste
+  try{exportJSON(true)}catch(e){}
 }
 
-/* La feuille de partage permet d'envoyer le fichier vers Fichiers, Drive… */
+/* Sharing sends the backup to Files, Drive or iCloud; browsers that cannot
+   share files get a download instead. */
 async function shareBackup(){
   const file=new File([JSON.stringify(D,null,2)],backupName(),{type:'application/json'});
   if(!(SHARE_OK&&navigator.canShare({files:[file]})))return exportJSON();
@@ -1099,7 +1083,6 @@ async function shareBackup(){
   }catch(e){}
 }
 
-/* ============ actions ============ */
 function exportJSON(auto){
   const b=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(b);
@@ -1128,7 +1111,7 @@ function bind(){
   const br=$('#bremind');if(br)br.onchange=()=>{D.settings.backup.remindDays=+br.value;save();render()};
   const bd=$('#bdaily');if(bd)bd.onchange=()=>{
     D.settings.backup.daily=bd.checked;save();
-    if(bd.checked)exportJSON(true);        // première sauvegarde tout de suite
+    if(bd.checked)exportJSON(true);
     render();
   };
 }
@@ -1179,8 +1162,9 @@ document.addEventListener('click',ev=>{
 });
 $('#fab').onclick=()=>expenseSheet();
 
-/* ============ installation ============ */
-// Demande au navigateur de ne pas évincer les données (utile surtout sur Firefox).
+/* Installation: the browser is asked to keep the data instead of clearing it
+   when space runs low, the app works offline, and Android offers to add it to
+   the home screen. */
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
@@ -1193,8 +1177,8 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;
   setTimeout(()=>b.remove(),12000);
 });
 
-/* Le mois courant existe peut-être déjà sans les lignes de salaire à jour
-   (profil modifié le mois dernier, mois créé avant la mise à jour). */
+/* At startup the current month picks up any salary profile change made since
+   it was created. */
 ensureMonth(cur);
 if(!D.months[cur].closed){
   const before=JSON.stringify(D.months[cur].incomes);
@@ -1205,7 +1189,8 @@ applyTheme(D.settings.theme,D.settings.mode);
 if(!persistent)$('#storewarn').classList.remove('hidden');
 render();
 bootBackup().then(armDailyBackup);
-/* Dernière chance d'écrire le fichier quand l'app passe en arrière-plan. */
+/* Pending changes are written to the backup folder as soon as the app goes to
+   the background. */
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='hidden'&&dirH&&!booting&&D.settings.backup.auto!==false){clearTimeout(bTimer);writeBackup(false)}
 });
