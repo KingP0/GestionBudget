@@ -5,8 +5,8 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#111111",
-  "theme_color": "#111111",
+  "background_color": "#0f241f",
+  "theme_color": "#0f241f",
   "lang": "fr",
   "description": "Budget mensuel personnel, enveloppes par catégorie et récap.",
   "icons": [

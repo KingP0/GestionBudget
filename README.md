@@ -47,9 +47,15 @@ ajouter une variante tient en une ligne dans le tableau `THEMES`. Les 16 combina
 respectent les contrastes AA (vérifié : texte principal ≥ 7:1, textes secondaires et
 boutons accentués ≥ 4.5:1).
 
-La couleur de l'écran de démarrage de l'app installée vient de `manifest.json`, qui
-est statique : elle est neutre (`#111111`), comme l'icône, pour ne jurer avec aucun
-des huit thèmes.
+Sur Android, Chrome colore l'écran de démarrage **et les barres système** (heure en
+haut, navigation en bas) avec les couleurs de `manifest.json`, figées à
+l'installation : il ignore la couleur que l'app règle pendant qu'elle tourne. Elles
+valent donc le fond du thème par défaut (vert sombre, `#0f241f`), pour que la barre
+d'onglets se prolonge sans raccord dans la barre de navigation Android. Avec un autre
+thème, une bande de couleur différente reste visible en bas : pour l'effacer, mettre
+le fond de ce thème dans le manifeste. Toute modification du manifeste demande
+d'incrémenter `V` dans `sw.js`, puis que Chrome mette à jour l'app installée (jusqu'à
+un jour) ou une réinstallation.
 
 ## Icône
 

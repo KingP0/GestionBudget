@@ -28,7 +28,7 @@
   --bad:#E97D63;
   --on-accent:#0C2019;
   --on-warn:#231602;
-  --tabbg:#0F2420EB;
+  --tabbg:#0F2420;
   --scrim:rgba(6,16,14,.62);
   --shadow:rgba(0,0,0,.45);
   --radius:14px;
@@ -36,6 +36,7 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
+html{min-height:calc(100% + env(safe-area-inset-top))}
 body{
   background:var(--bg);
   color:var(--ink);
@@ -46,7 +47,8 @@ body{
   overscroll-behavior-y:none;
 }
 /* On iPhone the app runs edge to edge: content stays clear of the status bar,
-   the notch and the home indicator. */
+   the notch and the home indicator, and the page always fills the whole screen
+   so the tab bar sits on the bottom edge even when a screen has little content. */
 #app{max-width:540px;margin:0 auto;padding:0 max(var(--gut),env(safe-area-inset-right)) 0 max(var(--gut),env(safe-area-inset-left))}
 h1,h2,h3{margin:0;font-weight:600}
 button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
@@ -200,14 +202,14 @@ function palette(id,mode){
       ink:C(34,13),'ink-2':C(14,30),'ink-3':C(12,41),
       good:C(58,31),warn:t.warn?'#7A5E00':'#8A5A00',bad:'#B33A2B',
       'on-accent':'#FFFFFF','on-warn':'#FFFFFF',
-      tabbg:'#FFFFFFEB',scrim:'rgba(24,32,30,.38)',shadow:'rgba(20,30,28,.16)',scheme:'light'};
+      tabbg:'#FFFFFF',scrim:'rgba(24,32,30,.38)',shadow:'rgba(20,30,28,.16)',scheme:'light'};
   }
   const bg=C(40,10);
   return {bg,surface:C(36,14),'surface-2':C(35,17),line:C(30,25),
     ink:C(22,93),'ink-2':C(16,68),'ink-3':C(14,59),
     good:C(48,70),warn:t.warn||'#E9B45A',bad:t.bad||'#EE8872',
     'on-accent':C(45,10),'on-warn':'#231602',
-    tabbg:bg+'EB',scrim:'rgba(6,14,12,.62)',shadow:'rgba(0,0,0,.45)',scheme:'dark'};
+    tabbg:bg,scrim:'rgba(6,14,12,.62)',shadow:'rgba(0,0,0,.45)',scheme:'dark'};
 }
 function applyTheme(id,mode){
   const p=palette(id,mode),r=document.documentElement;
