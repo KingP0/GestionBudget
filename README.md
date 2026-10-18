@@ -35,6 +35,21 @@ variables de sa catégorie ; les dépenses fixes sont suivies à part. C'est ce 
 juste le calcul « revenus − dépenses fixes − enveloppes − épargne = non attribué ».
 Une enveloppe se modifie *ce mois-ci seulement* ou *à partir de ce mois*.
 
+**Premier lancement.** Sur un budget vide, un guide en trois étapes s'ouvre une fois
+(salaire, dépenses fixes et enveloppes, sauvegarde) et se passe d'un appui. Il se
+rouvre par ⚙️ → *Revoir le guide*. Une sauvegarde antérieure qui contient déjà des
+dépenses ne le déclenche pas.
+
+**Montant variable.** Une dépense fixe peut être marquée « montant variable »
+(électricité, eau) : son montant prévu est affiché « à vérifier » dans Mois et dans
+Opérations, au lieu d'être pris pour argent comptant.
+
+**Catégories.** Celles sans enveloppe et sans dépense depuis six mois sont repliées
+sous *Catégories inutilisées*, dans Budget et dans la page Catégories. Supprimer une
+catégorie ne perd rien : ses dépenses et ses dépenses fixes passent dans Divers, son
+enveloppe disparaît, et la confirmation annonce combien de lignes sont déplacées.
+Supprimer une enveloppe seule : vider son montant.
+
 **Saisie.** Le bouton + ajoute une dépense ou un revenu. Les dépenses répétées (même
 libellé et même montant au moins deux fois en 3 mois) deviennent des favoris ajoutés
 en un appui ; un libellé déjà connu retrouve sa catégorie. Supprimer ou ajouter ne
@@ -78,10 +93,10 @@ boutons accentués ≥ 4.5:1).
 Sur Android, Chrome colore l'écran de démarrage **et les barres système** (heure en
 haut, navigation en bas) avec les couleurs de `manifest.json`, figées à
 l'installation : il ignore la couleur que l'app règle pendant qu'elle tourne. Elles
-valent donc le fond du thème par défaut (vert sombre, `#0f241f`), pour que la barre
-d'onglets se prolonge sans raccord dans la barre de navigation Android. Avec un autre
-thème, une bande de couleur différente reste visible en bas : pour l'effacer, mettre
-le fond de ce thème dans le manifeste. Toute modification du manifeste demande
+valent le fond du thème réellement utilisé (ici bleu clair, `#f5f7fa`), pour que la
+barre d'onglets se prolonge sans raccord dans la barre de navigation Android. En
+changeant de thème dans l'app, il faut donc remettre le fond du nouveau thème dans le
+manifeste, sans quoi une bande d'une autre couleur réapparaît en bas. Toute modification du manifeste demande
 d'incrémenter `V` dans `sw.js`, puis que Chrome mette à jour l'app installée (jusqu'à
 un jour) ou une réinstallation.
 

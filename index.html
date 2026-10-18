@@ -321,7 +321,7 @@ function save(opt){
 }
 function loadRaw(){try{return localStorage.getItem(KEY)}catch(e){persistent=false;$('#storewarn').classList.remove('hidden');return null}}
 
-const APP_VERSION='1.2';
+const APP_VERSION='1.3';
 const pad=n=>String(n).padStart(2,'0');
 const keyOf=d=>d.getFullYear()+'-'+pad(d.getMonth()+1);
 const today=()=>new Date();
@@ -346,7 +346,7 @@ function defaults(){
   return {v:3,
     settings:{alert:.8,carry:true,theme:'vert',mode:'sombre',
       salary:{label:'Salaire net',net:0,months:12,mode:'reel',bonusLabel:'13ᵉ mois',parts:[],payDay:28},
-      backup:{auto:true,daily:false,name:'budget.json',lastAt:null,remindDays:7}},
+      backup:{auto:true,daily:false,name:'budget.json',lastAt:null,remindDays:7},onboarded:false},
     categories:[
       C('alim','Alimentaire','🛒',null),
       C('resto','Restaurants & bars','🍜',null),
@@ -420,6 +420,7 @@ function migrate(){
   }
   if(!s.backup)s.backup={auto:true,daily:false,name:'budget.json',lastAt:null,remindDays:7};
   if(s.alert==null)s.alert=.8;
+  if(s.onboarded==null)s.onboarded=Object.keys(D.months).some(k=>D.months[k].expenses.length);
   if(s.carry==null)s.carry=true;
 }
 migrate();
@@ -603,9 +604,11 @@ const monthState=k=>k<thisKey()?'past':k===thisKey()?'cur':'future';
 function monthItems(m){
   return [...m.expenses.map(e=>({...e,kind:'out'})),...m.incomes.map(i=>({...i,kind:'in'}))];
 }
+const recOf=id=>D.recurring.find(r=>r.id===id);
 function opRow(o){
   const inc=o.kind==='in',later=isLater(o.date),d=+(o.date||'').slice(8,10);
-  const what=inc?(o.sid?'salaire':'revenu'):catPath(o.catId)+(o.rid?' · fixe':'');
+  const vary=o.rid&&(recOf(o.rid)||{}).vary;
+  const what=inc?(o.sid?'salaire':'revenu'):catPath(o.catId)+(o.rid?' · fixe':'')+(vary?' · montant à vérifier':'');
   const attr=inc?(o.sid?'data-salop':`data-income="${o.id}"`):`data-exp="${o.id}"`;
   return `<button class="exp${later?' planned':''}" ${attr}>
     ${inc?'<span class="em in">+</span>':`<span class="em">${emojiOf(o.catId)}</span>`}
@@ -859,10 +862,28 @@ function viewReglages(){
     <section><div class="sechead"><h2>Données</h2></div>
       <div class="rowbtns"><button class="btn" data-act="export">Exporter</button><button class="btn" data-act="import">Importer</button></div>
       <button class="btn ghost danger" data-act="reset" style="margin-top:9px">Tout effacer</button>
+      <button class="btn ghost" data-act="guide" style="margin-top:9px">Revoir le guide</button>
       <div class="tiny muted" style="margin:10px 2px 0">Données enregistrées sur cet appareil${persistent?'':' (enregistrement indisponible)'}${dirH?' et dans '+esc(dirH.name):''}.</div>
     </section>
     <div class="tiny muted" style="text-align:center;margin:0 0 24px">Budget · version ${APP_VERSION}</div>`;
 }
+
+/* A category nobody has used for six months and that carries no envelope is
+   folded away, so the lists stay short instead of growing forever. */
+let showUnused=false;
+function usedCats(){
+  const from=shiftKey(thisKey(),-5),set=new Set();
+  const add=id=>{set.add(id);const r=rootOf(id);if(r)set.add(r.id)};
+  Object.keys(D.months).filter(k=>k>=from).forEach(k=>D.months[k].expenses.forEach(e=>add(e.catId)));
+  D.recurring.forEach(r=>add(r.catId));
+  return set;
+}
+function splitCats(m,list){
+  const used=usedCats();
+  const live=list.filter(c=>used.has(c.id)||envOf(m,c.id)||kids(c.id).some(k=>used.has(k.id)));
+  return {live,idle:list.filter(c=>!live.includes(c))};
+}
+const idleRow=n=>`<button class="item" data-unused><span>🗄️</span><span class="mid muted">Catégories inutilisées (${n})</span><span class="muted">${showUnused?'▾':'›'}</span></button>`;
 
 /* Budget screen: the whole plan in one place, applied from the current month.
    On top, what is left to assign once fixed expenses, envelopes and planned
@@ -872,12 +893,14 @@ function viewBudget(){
   const seg=(v,c)=>p.income>0?`<i style="width:${Math.max(0,v)/p.income*100}%;background:${c}"></i>`:'';
   const fixed=D.recurring.filter(r=>!isSave(r.catId)),saves=D.recurring.filter(r=>isSave(r.catId));
   const recRow=r=>`<button class="item" data-rec="${r.id}" style="${r.active===false?'opacity:.45':''}"><span>${emojiOf(r.catId)}</span>
-      <span class="mid">${esc(r.label)}<span class="s">le ${r.day||1} · ${esc(catPath(r.catId))}${r.freq&&r.freq!=='monthly'?' · '+freqLabel(r):''}</span></span>
+      <span class="mid">${esc(r.label)}<span class="s">le ${r.day||1} · ${esc(catPath(r.catId))}${r.freq&&r.freq!=='monthly'?' · '+freqLabel(r):''}${r.vary?' · montant variable':''}</span></span>
       <span class="num">${eur(monthlyAmount(r))}</span></button>`;
   const regular=m.incomes.filter(i=>!i.sid&&i.keep!==false);
-  const envRows=roots().filter(c=>!c.save).map(c=>{const b=envOf(m,c.id);
+  const envRow=c=>{const b=envOf(m,c.id);
     return `<button class="item" data-envedit="${c.id}"><span>${c.emoji}</span><span class="mid">${esc(c.name)}</span>
-      <span class="num ${b?'':'muted'}">${b?eur(b):'—'}</span></button>`}).join('');
+      <span class="num ${b?'':'muted'}">${b?eur(b):'—'}</span></button>`};
+  const env=splitCats(m,roots().filter(c=>!c.save));
+  const envRows=env.live.map(envRow).join('')+(env.idle.length?idleRow(env.idle.length)+(showUnused?env.idle.map(envRow).join(''):''):'');
   return `<div class="plan"><span class="label muted">${p.free>=0?'Non attribué':'Plan dépassé de'}</span>
       <span class="amount serif num ${p.free<0?'bad':''}">${eur(Math.abs(p.free))}</span>
       <span class="tiny muted">${p.free>=0?'à répartir dans une enveloppe ou à épargner':'tes dépenses prévues dépassent tes revenus'}</span>
@@ -901,12 +924,15 @@ function viewBudget(){
 }
 function viewCategories(){
   const m=ensureMonth(thisKey());
-  const rows=roots().map(c=>{
+  const row=c=>{
     const b=m.budgets[c.id];
     const kk=kids(c.id).map(x=>`<button class="item child" data-catedit="${x.id}"><span class="mid">${esc(x.name)}</span><span class="num muted">${m.budgets[x.id]!=null?eur(m.budgets[x.id]):'—'}</span></button>`).join('');
-    return `<button class="item" data-catedit="${c.id}"><span>${c.emoji}</span><span class="mid">${esc(c.name)}${c.save?'<span class="s">compté comme épargne</span>':''}</span><span class="num ${b!=null?'':'muted'}">${b!=null?eur(b):'pas d\'enveloppe'}</span></button>${kk}`;
-  }).join('');
-  return `<section><div class="sechead"><h2>Toutes les catégories</h2><button data-act="cat-add">Ajouter</button></div><div class="card">${rows}</div></section>`;
+    return `<button class="item" data-catedit="${c.id}"><span>${c.emoji}</span><span class="mid">${esc(c.name)}${c.save?'<span class="s">compté comme épargne</span>':''}</span><span class="num ${b!=null?'':'muted'}">${b!=null?eur(b):'sans enveloppe'}</span></button>${kk}`;
+  };
+  const {live,idle}=splitCats(m,roots());
+  return `<section><div class="sechead"><h2>Catégories</h2><button data-act="cat-add">Ajouter</button></div>
+    <div class="card">${live.map(row).join('')}${idle.length?idleRow(idle.length)+(showUnused?idle.map(row).join(''):''):''}</div>
+    <div class="tiny muted" style="margin:8px 2px">Supprimer une catégorie garde ses dépenses : elles passent dans Divers.</div></section>`;
 }
 
 const closeSheets=()=>document.querySelectorAll('.sheetwrap').forEach(x=>x.remove());
@@ -960,6 +986,23 @@ function expenseSheet(id){
       toast('Supprimé : '+esc(e.label||catPath(e.catId)),()=>{m.expenses.splice(i,0,e);save();render()});
     };
   });
+}
+
+/* Shown once, on an empty budget: what each tab is for and where to start.
+   Skippable, and available again from the settings. */
+function guideSheet(){
+  const step=(n,t,d)=>`<div class="item" style="align-items:flex-start"><span class="num" style="color:var(--good);font-weight:600">${n}</span>
+    <span class="mid">${t}<span class="s">${d}</span></span></div>`;
+  sheet('Bienvenue',`
+    <div class="tiny muted" style="margin:-6px 0 12px">Budget suit un mois à la fois : ce que tu gagnes, ce qui part tout seul, et des enveloppes pour le reste.</div>
+    <div class="card">
+      ${step(1,'Ton salaire','Budget → Salaire : le net, son jour de versement, et le 13ᵉ mois si tu en as un.')}
+      ${step(2,'Tes dépenses fixes et tes enveloppes','Budget : loyer et abonnements avec leur jour, puis un budget par catégorie. En tête, ce qu’il te reste à attribuer.')}
+      ${step(3,'Ta sauvegarde','⚙️ → Sauvegarde : un dossier du téléphone, réécrit tout seul.')}
+    </div>
+    <div class="tiny muted" style="margin:12px 2px">Ensuite : le bouton + enregistre une dépense ou un revenu, Mois montre ce qu’il te reste, Opérations la liste, Analyse le mois et l’année.</div>
+    <button class="btn primary" data-onb="salary">Commencer par le salaire</button>
+    <button class="btn ghost" data-onb="skip">Passer</button>`,null,true);
 }
 
 /* Adding: one sheet for an expense or an income. Frequent expenses appear as
@@ -1165,8 +1208,21 @@ function catSheet(id){
       save();w.remove();render();
     };
     const d=w.querySelector('#del');if(d)d.onclick=()=>{
-      if(!confirm('Supprimer cette catégorie ? Les dépenses déjà enregistrées restent, sans catégorie.'))return;
-      D.categories=D.categories.filter(x=>x.id!==c.id&&x.parent!==c.id);save();w.remove();render();
+      const ids=new Set([c.id,...kids(c.id).map(x=>x.id)]);
+      const fb=roots().find(x=>x.id==='divers'&&!ids.has(x.id))||roots().find(x=>!x.save&&!ids.has(x.id));
+      if(!fb)return toast('Impossible : il ne resterait aucune catégorie');
+      let n=0;Object.keys(D.months).forEach(k=>D.months[k].expenses.forEach(e=>{if(ids.has(e.catId))n++}));
+      const nr=D.recurring.filter(r=>ids.has(r.catId)).length;
+      const moved=n||nr?`
+
+${n} dépense${n>1?'s':''} et ${nr} dépense${nr>1?'s':''} fixe${nr>1?'s':''} passeront dans « ${fb.name} », avec leur montant.`:'';
+      if(!confirm(`Supprimer « ${c.name} »${kids(c.id).length?' et ses sous-catégories':''} ?${moved}`))return;
+      Object.keys(D.months).forEach(k=>{const mm=D.months[k];
+        mm.expenses.forEach(e=>{if(ids.has(e.catId))e.catId=fb.id});
+        ids.forEach(id=>delete mm.budgets[id])});
+      D.recurring.forEach(r=>{if(ids.has(r.catId))r.catId=fb.id});
+      D.categories=D.categories.filter(x=>!ids.has(x.id));
+      save();w.remove();render();toast(n||nr?`Supprimée, ${n+nr} ligne${n+nr>1?'s':''} déplacée${n+nr>1?'s':''}`:'Catégorie supprimée');
     };
   });
 }
@@ -1184,6 +1240,7 @@ function recSheet(id,defCat){
       <option value="quarterly" ${r&&r.freq==='quarterly'?'selected':''}>Tous les 3 mois</option>
       <option value="yearly" ${r&&r.freq==='yearly'?'selected':''}>Une fois par an</option></select></div>
     <div class="field"><label for="c">Catégorie</label><select id="c">${catOptions(catDef)}</select></div>
+    <label style="display:flex;gap:10px;align-items:flex-start;padding:6px 0 10px"><input type="checkbox" id="vy" ${r&&r.vary?'checked':''} style="width:20px;height:20px;flex:none;margin-top:2px;accent-color:var(--good)"><span>Montant variable<span class="s tiny muted" style="display:block">Électricité, eau… le montant prévu est signalé « à vérifier ».</span></span></label>
     <label style="display:flex;gap:10px;align-items:center;padding:6px 0 14px"><input type="checkbox" id="ac" ${!r||r.active!==false?'checked':''} style="width:20px;height:20px;accent-color:var(--good)"><span>Active</span></label>
     <button class="btn primary" id="ok">Enregistrer</button>
     ${r?'<button class="btn ghost danger" id="del">Supprimer</button>':''}
@@ -1192,7 +1249,8 @@ function recSheet(id,defCat){
     w.querySelector('#ok').onclick=()=>{
       const o={label:w.querySelector('#l').value.trim()||'Dépense fixe',amount:r2(num(w.querySelector('#a').value)),
         day:Math.min(31,Math.max(1,Math.round(num(w.querySelector('#dy').value))||1)),
-        freq:w.querySelector('#f').value,catId:w.querySelector('#c').value,active:w.querySelector('#ac').checked};
+        freq:w.querySelector('#f').value,catId:w.querySelector('#c').value,active:w.querySelector('#ac').checked,
+        vary:w.querySelector('#vy').checked};
       if(o.amount<=0){w.querySelector('#a').focus();return toast('Indique un montant')}
       let rid;
       if(r){Object.assign(r,o);rid=r.id}else{rid=uid();D.recurring.push({id:rid,...o})}
@@ -1465,6 +1523,11 @@ document.addEventListener('click',ev=>{
   if(t=g('[data-goto]')){cur=t.dataset.goto;ensureMonth(cur);anaMode='mois';render();window.scrollTo(0,0);return}
   if(t=g('[data-ft]')){opsType=t.dataset.ft;render();return}
   if(t=g('[data-fc]')){filterCat=t.dataset.fc;render();return}
+  if(g('[data-unused]')){showUnused=!showUnused;render();return}
+  if(t=g('[data-onb]')){
+    D.settings.onboarded=true;save();closeSheets();
+    if(t.dataset.onb==='salary'){go('budget');salarySheet()}else render();
+    return}
   if(t=g('[data-fiche]')){ficheSheet(t.dataset.fiche);return}
   if(t=g('[data-envedit]')){envSheet(t.dataset.envedit);return}
   if(t=g('[data-exp]')){if(D.months[cur].closed)return toast(LOCKED);expenseSheet(t.dataset.exp);return}
@@ -1484,6 +1547,7 @@ document.addEventListener('click',ev=>{
     else if(a==='cat-add')catSheet();
     else if(a==='rec-add')recSheet();
     else if(a==='save-add')recSheet(null,'save');
+    else if(a==='guide')guideSheet();
     else if(a==='export')exportJSON();
     else if(a==='import')importJSON();
     else if(a==='bfolder')chooseFolder();
@@ -1544,6 +1608,7 @@ render();
 /* Home-screen shortcut (long press on the app icon, Android): opens straight on
    the add sheet. */
 if(new URLSearchParams(location.search).has('add')){history.replaceState(null,'',location.pathname);addSheet()}
+else if(!D.settings.onboarded)guideSheet();
 bootBackup().then(armDailyBackup);
 /* Pending changes are written to the backup folder as soon as the app goes to
    the background. */
