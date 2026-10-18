@@ -35,6 +35,10 @@
   --gut:16px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+/* Tapping a figure or a label never selects it: Android would slide its search
+   popup over the app. Only fields stay selectable. */
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea,select{-webkit-user-select:text;user-select:text}
 html,body{margin:0;padding:0}
 html{min-height:calc(100% + env(safe-area-inset-top))}
 body{

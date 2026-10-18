@@ -1,4 +1,4 @@
-const V = 'budget-v1.2';
+const V = 'budget-v1.2.1';
 const SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './icon-180.png'];
 
 self.addEventListener('install', e => {
