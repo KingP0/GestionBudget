@@ -93,10 +93,10 @@ boutons accentués ≥ 4.5:1).
 Sur Android, Chrome colore l'écran de démarrage **et les barres système** (heure en
 haut, navigation en bas) avec les couleurs de `manifest.json`, figées à
 l'installation : il ignore la couleur que l'app règle pendant qu'elle tourne. Elles
-valent le fond du thème réellement utilisé (ici bleu clair, `#f5f7fa`), pour que la
-barre d'onglets se prolonge sans raccord dans la barre de navigation Android. En
-changeant de thème dans l'app, il faut donc remettre le fond du nouveau thème dans le
-manifeste, sans quoi une bande d'une autre couleur réapparaît en bas. Toute modification du manifeste demande
+ne peuvent pas suivre le thème choisi. Elles valent donc `#111111`, noir, quel que
+soit le thème : splash et barres système noirs, comme l'icône. Avec un thème clair,
+la bande du bas tranche avec l'app ; c'est le prix d'une couleur figée. Seul le thème
+Graphite (`#18191b`) s'y fond. Toute modification du manifeste demande
 d'incrémenter `V` dans `sw.js`, puis que Chrome mette à jour l'app installée (jusqu'à
 un jour) ou une réinstallation.
 
